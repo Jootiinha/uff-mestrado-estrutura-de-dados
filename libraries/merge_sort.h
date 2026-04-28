@@ -1,3 +1,6 @@
+#ifndef MERGE_SORT_H
+#define MERGE_SORT_H
+
 #include <vector>
 #include <iostream>
 
@@ -36,6 +39,8 @@ public:
 
         while (i < n1) arr[k++] = L[i++];
         while (j < n2) arr[k++] = R[j++];
+        
+        std::cout << "Mesclando sub-arrays de " << left << " a " << right << std::endl;
     }
 
     void sortRecursive(std::vector<int> &arr, int left, int right) {
@@ -50,8 +55,11 @@ public:
 
     // Função pública para facilitar a chamada
     void sort(std::vector<int> &arr) {
+        std::cout << "Iniciando Merge Sort..." << std::endl;
         if (arr.size() > 1) {
             sortRecursive(arr, 0, arr.size() - 1);
         }
     }
 };
+
+#endif // MERGE_SORT_H
