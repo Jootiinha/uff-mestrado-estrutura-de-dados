@@ -21,9 +21,8 @@ $(BIN_DIR)/%: $(SRC_DIR)/%.cpp
 	$(CXX) $(CXXFLAGS) $< -o $@
 
 # Specific targets to run each algorithm
-# Usage: make run_bubble_sort
-run_%: $(BIN_DIR)/%
-	./$<
+run_%: clean $(BIN_DIR)/%
+	./$(BIN_DIR)/$*
 
 clean:
 	rm -rf $(BIN_DIR)
