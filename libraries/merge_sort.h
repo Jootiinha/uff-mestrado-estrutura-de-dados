@@ -1,62 +1,63 @@
 #ifndef MERGE_SORT_H
 #define MERGE_SORT_H
 
-#include <vector>
 #include <iostream>
+#include <vector>
 
 using namespace std;
 
 class MergeSort {
 public:
-    MergeSort() {}
-    ~MergeSort() {}
+  MergeSort() {}
+  ~MergeSort() {}
 
-    void merge(std::vector<int> &arr, int left, int middle, int right) {
-        int n1 = middle - left + 1;
-        int n2 = right - middle;
+  void merge(std::vector<int> &arr, int left, int middle, int right) {
+    int n1 = middle - left + 1;
+    int n2 = right - middle;
 
-        std::vector<int> L(n1), R(n2);
+    std::vector<int> L(n1), R(n2);
 
-        for (int i = 0; i < n1; i++) {
-            L[i] = arr[left + i];
-        }
-        for (int j = 0; j < n2; j++) {
-            R[j] = arr[middle + 1 + j];
-        }
-
-        int i = 0, j = 0, k = left;
-
-        while (i < n1 && j < n2) {
-            if (L[i] <= R[j]) {
-                arr[k] = L[i];
-                i++;
-            } else {
-                arr[k] = R[j];
-                j++; 
-            }
-            k++;
-        }
-
-        while (i < n1) arr[k++] = L[i++];
-        while (j < n2) arr[k++] = R[j++];
+    for (int i = 0; i < n1; i++) {
+      L[i] = arr[left + i];
+    }
+    for (int j = 0; j < n2; j++) {
+      R[j] = arr[middle + 1 + j];
     }
 
-    void sortRecursive(std::vector<int> &arr, int left, int right) {
-        if (left < right) {
-            int middle = left + (right - left) / 2;
+    int i = 0, j = 0, k = left;
 
-            sortRecursive(arr, left, middle);          // Divide a esquerda
-            sortRecursive(arr, middle + 1, right);      // Divide a direita
-            merge(arr, left, middle, right);            // Junta tudo
-        }
+    while (i < n1 && j < n2) {
+      if (L[i] <= R[j]) {
+        arr[k] = L[i];
+        i++;
+      } else {
+        arr[k] = R[j];
+        j++;
+      }
+      k++;
     }
 
-    // Função pública para facilitar a chamada
-    void sort(std::vector<int> &arr) {
-        if (arr.size() > 1) {
-            sortRecursive(arr, 0, arr.size() - 1);
-        }
+    while (i < n1)
+      arr[k++] = L[i++];
+    while (j < n2)
+      arr[k++] = R[j++];
+  }
+
+  void sortRecursive(std::vector<int> &arr, int left, int right) {
+    if (left < right) {
+      int middle = left + (right - left) / 2;
+
+      sortRecursive(arr, left, middle);      // Divide a esquerda
+      sortRecursive(arr, middle + 1, right); // Divide a direita
+      merge(arr, left, middle, right);       // Junta tudo
     }
+  }
+
+  void sort(std::vector<int> &arr) {
+    if (arr.size() > 1) {
+      sortRecursive(arr, 0, arr.size() - 1);
+    }
+  }
 };
 
 #endif // MERGE_SORT_H

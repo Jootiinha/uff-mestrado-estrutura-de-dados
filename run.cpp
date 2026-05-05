@@ -33,7 +33,7 @@ int main(int argc, char *argv[]) {
   }
 
   string algo = argv[1];
-  int size = 10; // Default size
+  int size = 10;
   if (argc >= 3) {
     size = stoi(argv[2]);
   }
