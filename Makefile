@@ -17,9 +17,11 @@ all: run
 run: clean run.cpp
 	$(CXX) $(CXXFLAGS) run.cpp -o run
 
-$(ALGS): run
-	@./run $@ $(RUN_ARGS)
+benchmark: clean benchmark.cpp
+	$(CXX) $(CXXFLAGS) benchmark.cpp -o benchmark
+	mkdir -p results
+	./benchmark
 
 clean:
-	rm -f run
+	rm -f run benchmark
 	rm -rf $(BIN_DIR)

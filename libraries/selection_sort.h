@@ -12,7 +12,6 @@ public:
     ~SelectionSort() {}
 
     void sort(std::vector<int> &arr) {
-        std::cout << "Iniciando Selection Sort..." << std::endl;
         int n = arr.size();
 
         for (int i = 0; i < n - 1; i++) {
@@ -24,7 +23,6 @@ public:
             }
 
             if (min_idx != i) {
-                std::cout << "Trocando " << arr[i] << " pelo menor encontrado " << arr[min_idx] << std::endl;
                 std::swap(arr[i], arr[min_idx]);
             }
         }

@@ -18,11 +18,9 @@ public:
         for (int j = low; j <= high - 1; j++) {
             if (arr[j] < pivot) {
                 i++;
-                std::cout << "Trocando " << arr[i] << " e " << arr[j] << std::endl;
                 std::swap(arr[i], arr[j]);
             }
         }
-        std::cout << "Posicionando pivô " << pivot << " na posição " << i + 1 << std::endl;
         std::swap(arr[i + 1], arr[high]);
         return (i + 1);
     }
@@ -37,7 +35,6 @@ public:
     }
 
     void sort(std::vector<int> &arr) {
-        std::cout << "Iniciando Quick Sort..." << std::endl;
         if (!arr.empty()) {
             sortRecursive(arr, 0, arr.size() - 1);
         }
