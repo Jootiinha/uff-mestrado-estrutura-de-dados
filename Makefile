@@ -25,3 +25,4 @@ benchmark: clean benchmark.cpp
 clean:
 	rm -f run benchmark
 	rm -rf $(BIN_DIR)
+	rm -rf results
