@@ -1,29 +1,25 @@
 CXX = g++
 CXXFLAGS = -Wall -std=c++17 -Ilibraries
-SRC_DIR = sorts
 BIN_DIR = execs
+ALGS = bubble_sort insertion_sort merge_sort quick_sort selection_sort
 
-# List of source files (basenames)
-SRCS_BASE = bubble_sort insertion_sort merge_sort quick_sort selection_sort
-# List of executables
-BINS = $(SRCS_BASE:%=$(BIN_DIR)/%)
+# Este bloco permite passar argumentos para o make (ex: make merge_sort 1000)
+# Ele filtra o primeiro objetivo (o algoritmo) e trata o resto como argumentos.
+ifeq ($(filter $(firstword $(MAKECMDGOALS)),$(ALGS)),$(firstword $(MAKECMDGOALS)))
+  RUN_ARGS := $(wordlist 2,$(words $(MAKECMDGOALS)),$(MAKECMDGOALS))
+  $(eval $(RUN_ARGS):;@:)
+endif
 
-.PHONY: all clean run_%
+.PHONY: all clean $(ALGS)
 
-all: $(BIN_DIR) $(BINS)
+all: run
 
-# Create the binary directory if it doesn't exist
-$(BIN_DIR):
-	mkdir -p $(BIN_DIR)
+run: clean run.cpp
+	$(CXX) $(CXXFLAGS) run.cpp -o run
 
-# Pattern rule to compile .cpp from SRC_DIR to executables in BIN_DIR
-$(BIN_DIR)/%: $(SRC_DIR)/%.cpp
-	$(CXX) $(CXXFLAGS) $< -o $@
-
-# Specific targets to run each algorithm
-run_%: clean $(BIN_DIR)/%
-	./$(BIN_DIR)/$*
+$(ALGS): run
+	@./run $@ $(RUN_ARGS)
 
 clean:
+	rm -f run
 	rm -rf $(BIN_DIR)
-	mkdir -p $(BIN_DIR)
