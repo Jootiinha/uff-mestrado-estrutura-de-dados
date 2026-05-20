@@ -1,0 +1,551 @@
+% ------------------------------------------------------------------------
+% ------------------------------------------------------------------------
+% abnTeX2: Modelo de Artigo Acadêmico em conformidade com
+% ABNT NBR 6022:2003: Informação e documentação - Artigo em publicação 
+% periódica científica impressa - Apresentação
+% ------------------------------------------------------------------------
+% ------------------------------------------------------------------------
+
+\documentclass[
+	% -- opções da classe memoir --
+	article,			% indica que é um artigo acadêmico
+	11pt,				% tamanho da fonte
+	oneside,			% para impressão apenas no verso. Oposto a twoside
+	a4paper,			% tamanho do papel. 
+	% -- opções da classe abntex2 --
+	%chapter=TITLE,		% títulos de capítulos convertidos em letras maiúsculas
+	%section=TITLE,		% títulos de seções convertidos em letras maiúsculas
+	%subsection=TITLE,	% títulos de subseções convertidos em letras maiúsculas
+	%subsubsection=TITLE % títulos de subsubseções convertidos em letras maiúsculas
+	% -- opções do pacote babel --
+	english,			% idioma adicional para hifenização
+	brazil,				% o último idioma é o principal do documento
+	sumario=tradicional
+	]{abntex2}
+
+
+% ---
+% PACOTES
+% ---
+
+% ---
+% Pacotes fundamentais 
+% ---
+\usepackage{lmodern}			% Usa a fonte Latin Modern
+\usepackage[T1]{fontenc}		% Selecao de codigos de fonte.
+\usepackage[utf8]{inputenc}		% Codificacao do documento (conversão automática dos acentos)
+\usepackage{indentfirst}		% Indenta o primeiro parágrafo de cada seção.
+\usepackage{nomencl} 			% Lista de simbolos
+\usepackage{color}				% Controle das cores
+\usepackage{graphicx}			% Inclusão de gráficos
+\usepackage{microtype} 			% para melhorias de justificação
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{amsmath}
+\usepackage{float}
+\lstset{
+  language=C++,
+  basicstyle=\ttfamily\small,
+  keywordstyle=\color{blue},
+  stringstyle=\color{red},
+  commentstyle=\color{green!60!black},
+  morecomment=[l][\color{magenta}]{\#},
+  numbers=left,
+  numberstyle=\tiny\color{gray},
+  stepnumber=1,
+  numbersep=10pt,
+  backgroundcolor=\color{gray!10},
+  frame=single,
+  breaklines=true,
+  tabsize=2,
+  captionpos=b,
+    literate=
+  {ç}{{\c c}}1
+  {Ç}{{\c C}}1
+  {ã}{{\~a}}1
+  {õ}{{\~o}}1
+  {á}{{\'a}}1
+  {à}{{\`a}}1
+  {é}{{\'e}}1
+  {í}{{\'i}}1
+  {ó}{{\'o}}1
+  {ú}{{\'u}}1
+}
+% ---
+		
+% ---
+% Pacotes adicionais, usados apenas no âmbito do Modelo Canônico do abnteX2
+% ---
+\usepackage{lipsum}				% para geração de dummy text
+% ---
+		
+% ---
+% Pacotes de citações
+% ---
+\usepackage[brazilian,hyperpageref]{backref}	 % Paginas com as citações na bibl
+\usepackage[alf]{abntex2cite}	% Citações padrão ABNT
+% ---
+
+% ---
+% Configurações do pacote backref
+% Usado sem a opção hyperpageref de backref
+\renewcommand{\backrefpagesname}{Citado na(s) página(s):~}
+% Texto padrão antes do número das páginas
+\renewcommand{\backref}{}
+% Define os textos da citação
+\renewcommand*{\backrefalt}[4]{
+	\ifcase #1 %
+		Nenhuma citação no texto.%
+	\or
+		Citado na página #2.%
+	\else
+		Citado #1 vezes nas páginas #2.%
+	\fi}%
+% ---
+
+% ---
+% Informações de dados para CAPA e FOLHA DE ROSTO
+% ---
+\titulo{Comparação de Eficiência entre\\ Algoritmos de Ordenação}
+\autor{ Ana Beatriz Vasconcelos \and João Monteiro}
+\local{Brasil}
+\data{2026}
+% ---
+
+% ---
+% Configurações de aparência do PDF final
+
+% alterando o aspecto da cor azul
+\definecolor{blue}{RGB}{41,5,195}
+
+% informações do PDF
+\makeatletter
+\hypersetup{
+     	%pagebackref=true,
+		pdftitle={\@title}, 
+		pdfauthor={\@author},
+    	pdfsubject={Modelo de artigo científico com abnTeX2},
+	    pdfcreator={LaTeX with abnTeX2},
+		pdfkeywords={abnt}{latex}{abntex}{abntex2}{atigo científico}, 
+		colorlinks=true,       		% false: boxed links; true: colored links
+    	linkcolor=blue,          	% color of internal links
+    	citecolor=blue,        		% color of links to bibliography
+    	filecolor=magenta,      		% color of file links
+		urlcolor=blue,
+		bookmarksdepth=4
+}
+\makeatother
+% --- 
+
+% ---
+% compila o indice
+% ---
+\makeindex
+% ---
+
+% ---
+% Altera as margens padrões
+% ---
+\setlrmarginsandblock{3cm}{3cm}{*}
+\setulmarginsandblock{3cm}{3cm}{*}
+\checkandfixthelayout
+% ---
+
+% --- 
+% Espaçamentos entre linhas e parágrafos 
+% --- 
+
+% O tamanho do parágrafo é dado por:
+\setlength{\parindent}{1.3cm}
+
+% Controle do espaçamento entre um parágrafo e outro:
+\setlength{\parskip}{0.2cm}  % tente também \onelineskip
+
+% Espaçamento simples
+\SingleSpacing
+
+% ----
+% Início do documento
+% ----
+\begin{document}
+
+% Retira espaço extra obsoleto entre as frases.
+\frenchspacing 
+
+% ----------------------------------------------------------
+% ELEMENTOS PRÉ-TEXTUAIS
+% ----------------------------------------------------------
+
+%---
+
+%
+%---
+% página de titulo
+\maketitle
+
+% resumo em português
+\begin{resumoumacoluna}
+inserir resumo
+ \vspace{\onelineskip}
+ 
+ \noindent
+ \textbf{Palavras-chaves}: Métodos de Ordenação. Estrutura de Dados e Algoritmos. Análise de Eficiência.
+\end{resumoumacoluna}
+
+
+
+% ----------------------------------------------------------
+% ELEMENTOS TEXTUAIS
+% ----------------------------------------------------------
+\textual
+
+% ----------------------------------------------------------
+% Introdução
+% ----------------------------------------------------------
+\section*{Introdução}
+\addcontentsline{toc}{section}{Introdução}
+Algoritmos podem ser entendido como uma série de passos para transformar um input em um output desejado. Segundo \cite{cormen2022introduction} um algoritmo pode ser entendido informalmente como um procedimento computacional bem definido que recebe um valor ou um conjunto de valores, como inputs e produz um valor ou conjutno de valores, como outputs.
+
+Um tópico frequente e bastante útil na programação é o ordenamento de itens e de acordo com \cite{donald1999art} existem diversas aplicações de algoritmos de ordenação e busca dentre elas: busca por informação por chave e valor, matching items em um ou mais arquivos e resolver o problema de"\textit{togetherness}". Para resolver problemas de ordenação existem diferentes algoritmos que resolvem o problema de forma diversa, sendo a compreensão e o estudo do suas particularidades fundamental para selecionar o algoritmo que melhor se aplica a problemas praticos de ordenação.
+
+A fim de avaliar o desempenho em termos de tempo de execução dentre os diferentes algoritmos de ordenção, neste trabalho realizaremos uma análise empirica a partir da comparação do tempo de execução de dos principais algoritmos de ordenação sendo eles: \textit{buble sort, insertion sort, selection sort, merge sort, quick sort}.
+
+% ----------------------------------------------------------
+% Fundamentação teórica
+% ----------------------------------------------------------
+\section{Fundamentação teórica}
+
+
+\subsection{Bubble sort}
+O método bubble sort ou bolha consiste em comparar os elementos dois a dois. Em cada iteração desse método a lista é percorrida a partir do seu início comparando cada elemento com seu sucessor, trocando-os de posição caso se aplique. No método bolha os elementos mais "densos" são passados para o "fundo" da lista, ou seja, para uma lista de tamanho n, um elemento que está inicialmente numa posição i e, para obter uma lista ordenada, ele deve ocupar a posição j, então ele terá que passar por todas as posições entre i e j.\cite{viana2011pesquisa}.
+
+A Figura \ref{fig:bubblesort} apresenta a implementação do método bolha que consiste em dois laços de repetição sendo o mais externo o que determinará o total de iterações a ser realizada, enquanto o laco interno percorre a lista comparando os elementos e realizando as trocas iniciando em 0 até n - 1 - i, ou seja, a cada iteração o método estará ordenando uma lista menor uma vez que os items nas ultimas posições i do vetor já estão ordenados. Adicionalmente, é utilizada uma variável booleana \textit{swapped}, que permite identificar se houve alguma troca durante uma iteração. Caso nenhuma troca ocorra, conclui-se que a lista já está ordenada, permitindo a interrupção antecipada do algoritmo e evitando execuções desnecessárias.
+\begin{figure}[H]
+\centering
+\begin{lstlisting}[]
+class BubbleSort {
+public:
+  BubbleSort() {};
+  ~BubbleSort() {};
+
+  void sort(std::vector<int> &arr) {
+    std::cout << "Iniciando Bubble Sort..." << std::endl;
+    int n = arr.size();
+    bool swapped;
+
+    for (int i = 0; i < n - 1; i++) {
+      swapped = false;
+
+      for (int j = 0; j < n - 1 - i; j++) {
+        if (arr[j] > arr[j + 1]) {
+          std::cout << "Trocando " << arr[j] << " e " << arr[j + 1] << endl;
+          std::swap(arr[j], arr[j + 1]);
+          swapped = true;
+        }
+      }
+
+      if (!swapped) {
+        break;
+      }
+    }
+  }
+};
+\end{lstlisting}
+\caption{Implementação do algoritmo Bubble Sort em C++}
+\label{fig:bubblesort}
+\end{figure}
+
+No método bolha a operação de troca e comparação são as operações relevantes e analisando a complexidade no pior caso desse algoritmo temos:
+
+\begin{equation}
+\begin{gathered}
+t(1) = n - 1 \\
+t(2) = n - 2 \\
+t(3) = n - 3 \\
+\vdots \\
+t(n-1) = 1 \\
+\\
+T(n) = (n-1) + (n-2) + \cdots + 1 \\
+\\
+T(n) = \sum_{i=1}^{n-1} i \\
+\end{gathered}
+\end{equation}
+Aplicando a fórmula da soma de uma progressão aritmética (PA), temos:
+\[
+\frac{(n-1 + 1)\,n}{2}.
+\]
+
+Simplificando, obtemos:
+\[
+\frac{n(n-1)}{2}.
+\]
+
+Baseada em técnicas apresentadas em material de apoio da disciplina de estrutura de dados \cite{bigO2026} podemos aplicar a notação Big O:
+\[
+O(n^2 - n).
+\]
+
+Priorizando o termo de maior grau, é possivel concluir que a complexidade do método bolha no pior caso é:
+\[
+O(n^2).
+\]
+
+
+\subsection{Insertion sort}
+O método de insertion sort desloca vários elementos e insere um elemento na ordem correta. Nesse metodo cada interação consiste em inserir o elemento na sua ordem correta, percorrendo a lista da esquerda para direita. A Figura \ref{fig:insertionsort} apresenta a implementação do algoritmo de inserção. Primeiro obtem-se o número de elementos do vetor (n) então o laço de repetição percorre o vetor de 1 até n definindo a variavel numérica \textit{key} que é utilizada para realizar as comparações e j é a posição anterior a i. No laço de repetição interno verifica-se se j é maior ou igual a zero, ou seja, ainda não se chegou ao fim do vetor e se j é maior que a \textit{key} utilizada. Enquanto essa condição é valida, o elemento na posição j será movido para j + 1 e j é reduzido em uma unidade. Por fim, o elemento de interesse, \textit{key}, é introduzido na posição j + 1. 
+
+
+\begin{figure}[H]
+\centering
+\begin{lstlisting}[language=C++]
+class InsertionSort {
+public:
+    InsertionSort() {};
+    ~InsertionSort() {};
+
+    void sort(std::vector<int> &arr){
+        std::cout << "Iniciando Insertion Sort..." << std::endl;
+        int n = arr.size();
+
+        for (int i = 1; i < n; i++){
+            int key = arr[i];
+            int j = i - 1;
+
+            // Enquanto o elemento à esquerda for maior que a chave
+            // empurramos ele uma posicão para a direita
+            while(j >= 0 && arr[j] > key){
+                std::cout << "Movendo " << arr[j] << " para a direita" << std::endl;
+                arr[j + 1] = arr[j];
+                j = j - 1;
+            }
+
+            arr[j + 1] = key;
+        }
+    }
+};
+\end{lstlisting}
+\caption{Implementação do algoritmo Insertion Sort em C++}
+\label{fig:insertionsort}
+\end{figure}
+
+
+Ao analisar o pior caso, uma lista inversamente ordenada temos:
+Para o laço externo:
+\[
+T(n) = (n - 1) \\
+\]
+Para o laço de interno:
+\begin{equation}
+\begin{gathered}
+t(1) = 1 \\
+t(2) = 2 \\
+t(3) = 3 \\
+\vdots \\
+t(n-1) = n -1 \\
+\\
+T(n) = (1) + (2) + \cdots + (n - 1) \\
+\\
+T(n) = \sum_{i=1}^{n-1} i \\
+\end{gathered}
+\end{equation}
+Aplicando a fórmula da soma de uma progressão aritmética (PA), temos:
+\[
+\frac{(1 + (n - 1))\,(n -1)}{2}.
+\]
+
+Simplificando, obtemos:
+\[
+\frac{n(n-1)}{2}.
+\]
+
+Em notação Big O:
+\[
+O(n^2 - n).
+\]
+
+Priorizando o termo de maior grau, é possivel concluir que a complexidade do método de inserção no pior caso é:
+\[
+O(n^2).
+\]
+\subsection{Selection Sort}
+ O metodo de seleção ou \textit{selection sort} assim como o de inserção insere o elemento na posição correta a partir da seleção do elemento de maior prioridade. a figura \ref{fig:selectionsort} apresenta um exemplo de implementação desse metodo. 
+
+\begin{figure}[H]
+\centering
+\begin{lstlisting}[]
+class SelectionSort {
+public:
+    SelectionSort() {}
+    ~SelectionSort() {}
+
+    void sort(std::vector<int> &arr) {
+        std::cout << "Iniciando Selection Sort..." << std::endl;
+        int n = arr.size();
+
+        for (int i = 0; i < n - 1; i++) {
+            int min_idx = i;
+            for (int j = i + 1; j < n; j++) {
+                if (arr[j] < arr[min_idx]) {
+                    min_idx = j;
+                }
+            }
+
+            if (min_idx != i) {
+                std::cout << "Trocando " << arr[i] 
+                          << " pelo menor encontrado " 
+                          << arr[min_idx] << std::endl;
+                std::swap(arr[i], arr[min_idx]);
+            }
+        }
+    }
+};
+\end{lstlisting}
+\caption{Implementação do Selection Sort em C++}
+\label{fig:selectionsort}
+\end{figure}
+
+Ao analisar o método é possivel destacar como operações relevantes as operações de comparação e troca o que permite a análise complexidade do algoritmo sendo:
+para cada execução 
+\begin{equation}
+\begin{gathered}
+t(2) =  1 \\
+t(3) = 3 \\
+t(4) = 6 \\
+t(5) = 10 \\
+\vdots \\
+t(n-1) = n -1  \\
+\\
+T(n) = 1 + 2 + \cdots + (n - 1) \\
+\\
+T(n) = \sum_{i=1}^{n-1} i \\
+\end{gathered}
+\end{equation}
+Aplicando a fórmula da soma de uma progressão aritmética (PA), temos:
+\[
+\frac{(n-1 + 1)\,n}{2}.
+\]
+
+Simplificando, obtemos:
+\[
+\frac{n(n-1)}{2}.
+\]
+
+Ao aplicar a notação Big O:
+\[
+O(n^2 - n).
+\]
+
+Priorizando o termo de maior grau, é possivel concluir que a complexidade do método de seleção no pior caso é:
+\[
+O(n^2).
+\]
+
+\subsection{Merge Sort}
+
+O \textit{merge sort} soluciona o problema de ordenação a partir da divisão do vetor em duas partes de igual tamanho e ordena os subconjuntos para depois realizar a mesclagem ou \textit{merge} dos subconjuntos. A figura \ref{fig:mergesort} apresenta um exemplo de implementação do método de mesclagem.
+
+\begin{figure}[H]
+\centering
+\begin{lstlisting}[]
+class MergeSort {
+public:
+    MergeSort() {}
+    ~MergeSort() {}
+
+    void merge(std::vector<int> &arr, int left, int middle, int right) {
+        int n1 = middle - left + 1;
+        int n2 = right - middle;
+
+        std::vector<int> L(n1), R(n2);
+
+        for (int i = 0; i < n1; i++) {
+            L[i] = arr[left + i];
+        }
+        for (int j = 0; j < n2; j++) {
+            R[j] = arr[middle + 1 + j];
+        }
+
+        int i = 0, j = 0, k = left;
+
+        while (i < n1 && j < n2) {
+            if (L[i] <= R[j]) {
+                arr[k] = L[i];
+                i++;
+            } else {
+                arr[k] = R[j];
+                j++;
+            }
+            k++;
+        }
+
+        while (i < n1) arr[k++] = L[i++];
+        while (j < n2) arr[k++] = R[j++];
+
+        std::cout << "Mesclando sub-arrays de "
+                  << left << " a " << right << std::endl;
+    }
+
+    void sortRecursive(std::vector<int> &arr, int left, int right) {
+        if (left < right) {
+            int middle = left + (right - left) / 2;
+
+            sortRecursive(arr, left, middle);
+            sortRecursive(arr, middle + 1, right);
+            merge(arr, left, middle, right);
+        }
+    }
+
+    void sort(std::vector<int> &arr) {
+        std::cout << "Iniciando Merge Sort..." << std::endl;
+        if (arr.size() > 1) {
+            sortRecursive(arr, 0, arr.size() - 1);
+        }
+    }
+};
+\end{lstlisting}
+\caption{Implementação do Merge Sort em C++}
+\label{fig:mergesort}
+\end{figure}
+% ----------------------------------------------------------
+% Metodologia
+% ----------------------------------------------------------
+% ---
+
+\section{Metodologia}
+Foram elaborados testes para cada um dos algoritmos de ordenação estudados a partir de construção de um programa e de vetores de diferentes tamanhos iniciando de 5000 ate 20000, aumentando de 1000 em 1000 até obter o vetor de maior tamanho. A fim de analisar o tempo médio de execução de cada algoritmo estudado para cada tamanho de vetor, foram realizadas multiplas execuções com vetores preenchidos a partir de números aleatórios em um intervalo de 0 até 100000.
+
+\subsection{Projeto/Programa}
+
+Descrever organização do projeto /libs etc 
+
+% Finaliza a parte no bookmark do PDF, para que se inicie o bookmark na raiz
+% ---
+\bookmarksetup{startatroot}% 
+% ---
+
+% ---
+% Conclusão
+% ---
+\section*{Considerações finais}
+\addcontentsline{toc}{section}{Considerações finais}
+
+\lipsum[1]
+
+\begin{citacao}
+\lipsum[2]
+\end{citacao}
+
+\lipsum[3]
+
+% ----------------------------------------------------------
+% ELEMENTOS PÓS-TEXTUAIS
+% ----------------------------------------------------------
+\postextual
+
+
+% ----------------------------------------------------------
+% Referências bibliográficas
+% ----------------------------------------------------------
+\bibliography{abntex2-modelo-references}
+
+\end{document}

@@ -21,6 +21,7 @@ benchmark: clean benchmark.cpp
 	$(CXX) $(CXXFLAGS) benchmark.cpp -o benchmark
 	mkdir -p results
 	./benchmark
+	gnuplot plot_results.gp
 
 clean:
 	rm -f run benchmark
