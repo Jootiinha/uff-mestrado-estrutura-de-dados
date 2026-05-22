@@ -13,3 +13,8 @@ plot 'results/averages.dat' using 1:2 with linespoints title 'Bubble Sort', \
      'results/averages.dat' using 1:4 with linespoints title 'Merge Sort', \
      'results/averages.dat' using 1:5 with linespoints title 'Quick Sort', \
      'results/averages.dat' using 1:6 with linespoints title 'Selection Sort'
+
+set output 'results/chart_fast.png'
+set title "Comparação de Algoritmos O(N log N): Merge Sort vs Quick Sort"
+plot 'results/averages.dat' using 1:4 with linespoints title 'Merge Sort', \
+     'results/averages.dat' using 1:5 with linespoints title 'Quick Sort'

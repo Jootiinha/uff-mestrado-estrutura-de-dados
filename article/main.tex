@@ -689,10 +689,16 @@ Além da representação visual, os resultados pormenorizados encontram-se tabul
     \label{fig:chart}
 \end{figure}
 
-\noindent
-\fcolorbox{gray}{yellow!20}{\parbox{\linewidth}{
-\textbf{Nota:} Inserir gráfico do quick e Merge Sort e comentar
-}}
+Como os algoritmos $O(N \log N)$ possuem tempos de execução substancialmente menores que os de complexidade $O(N^2)$, suas curvas tendem a se achatar próximo ao eixo horizontal quando plotadas em conjunto, dificultando a distinção visual entre eles. Para uma visualização mais clara e detalhada da diferença de desempenho apenas entre o \textit{Merge Sort} e o \textit{Quick Sort}, a Figura \ref{fig:chart_fast} isola os resultados destes dois métodos.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{results/chart_fast.png}
+    \caption{Comparação do tempo de execução isolado para os algoritmos de complexidade $O(N \log N)$: Merge Sort e Quick Sort.}
+    \label{fig:chart_fast}
+\end{figure}
+
+Observa-se que, apesar de ambos apresentarem a mesma ordem de complexidade temporal ($O(N \log N)$) na média, o \textit{Quick Sort} demonstra um desempenho prático significativamente superior ao \textit{Merge Sort} para todos os tamanhos testados. Esse menor tempo absoluto do \textit{Quick Sort} justifica a sua forte adoção e popularidade na implementação nativa de métodos de ordenação na maioria das bibliotecas padrão de diversas linguagens de programação.
 % Finaliza a parte no bookmark do PDF, para que se inicie o bookmark na raiz
 % ---
 \bookmarksetup{startatroot}% 
