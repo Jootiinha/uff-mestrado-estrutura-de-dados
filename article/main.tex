@@ -185,7 +185,17 @@
 
 % resumo em português
 \begin{resumoumacoluna}
-inserir resumo
+Este trabalho apresenta um estudo comparativo da eficiência de cinco algoritmos clássicos
+de ordenação: Bubble Sort, Insertion Sort, Selection Sort, Merge Sort e Quick Sort. O
+objetivo principal é avaliar o desempenho prático desses métodos em relação à sua
+complexidade teórica de tempo. Para isso, foram desenvolvidos de testes em C++ que
+submeteram os algoritmos a vetores de números aleatórios com tamanhos variando de 50000
+a 20000 elementos. Os resultados empíricos confirmam a fundamentação teórica,
+demonstrando que os algoritmos com complexidade $O(N \log N)$ (Merge Sort e Quick
+Sort) apresentam um desempenho significativamente superior e maior escalabilidade em
+comparação aos algoritmos de complexidade quadrática $O(N^2)$ (Bubble Sort, Insertion
+Sort e Selection Sort). O estudo reforça a importância da seleção adequada do algoritmo
+de ordenação com base no volume de dados a ser processado.
  \vspace{\onelineskip}
  
  \noindent
@@ -204,11 +214,11 @@ inserir resumo
 % ----------------------------------------------------------
 \section*{Introdução}
 \addcontentsline{toc}{section}{Introdução}
-Algoritmos podem ser entendido como uma série de passos para transformar um input em um output desejado. Segundo \cite{cormen2022introduction} um algoritmo pode ser entendido informalmente como um procedimento computacional bem definido que recebe um valor ou um conjunto de valores, como inputs e produz um valor ou conjutno de valores, como outputs.
+Algoritmos podem ser entendidos como uma série de passos para transformar um input em um output desejado. Segundo \citeonline{cormen2022introduction} um algoritmo pode ser entendido informalmente como um procedimento computacional bem definido que recebe um valor ou um conjunto de valores, como inputs e produz um valor ou conjunto de valores, como outputs.
 
-Um tópico frequente e bastante útil na programação é o ordenamento de itens e de acordo com \cite{donald1999art} existem diversas aplicações de algoritmos de ordenação e busca dentre elas: busca por informação por chave e valor, matching items em um ou mais arquivos e resolver o problema de"\textit{togetherness}". Para resolver problemas de ordenação existem diferentes algoritmos que resolvem o problema de forma diversa, sendo a compreensão e o estudo do suas particularidades fundamental para selecionar o algoritmo que melhor se aplica a problemas praticos de ordenação.
+Um tópico frequente e bastante útil na programação é o ordenamento de itens e de acordo com \citeonline{donald1999art} existem diversas aplicações de algoritmos de ordenação e busca dentre elas: busca por informação por chave e valor, matching items em um ou mais arquivos e resolver o problema de"\textit{togetherness}". Para resolver problemas de ordenação existem diferentes algoritmos que resolvem o problema de forma diversa, sendo a compreensão e o estudo do suas particularidades fundamental para selecionar o algoritmo que melhor se aplica a problemas práticos de ordenação.
 
-A fim de avaliar o desempenho em termos de tempo de execução dentre os diferentes algoritmos de ordenção, neste trabalho realizaremos uma análise empirica a partir da comparação do tempo de execução de dos principais algoritmos de ordenação sendo eles: \textit{buble sort, insertion sort, selection sort, merge sort, quick sort}.
+A fim de avaliar o desempenho em termos de tempo de execução dentre os diferentes algoritmos de ordenação, neste trabalho realizaremos uma análise empírica a partir da comparação do tempo de execução dos principais algoritmos de ordenação, sendo eles: Bubble Sort, Insertion Sort, Selection Sort, Merge Sort e Quick Sort.
 
 % ----------------------------------------------------------
 % Fundamentação teórica
@@ -217,7 +227,7 @@ A fim de avaliar o desempenho em termos de tempo de execução dentre os diferen
 
 
 \subsection{Bubble sort}
-O método bubble sort ou bolha consiste em comparar os elementos dois a dois. Em cada iteração desse método a lista é percorrida a partir do seu início comparando cada elemento com seu sucessor, trocando-os de posição caso se aplique. No método bolha os elementos mais "densos" são passados para o "fundo" da lista, ou seja, para uma lista de tamanho n, um elemento que está inicialmente numa posição i e, para obter uma lista ordenada, ele deve ocupar a posição j, então ele terá que passar por todas as posições entre i e j.\cite{viana2011pesquisa}.
+O método Bubble Sort ou bolha consiste em comparar os elementos dois a dois. Em cada iteração desse método a lista é percorrida a partir do seu início comparando cada elemento com seu sucessor, trocando-os de posição caso se aplique. No método bolha os elementos mais "densos" são passados para o "fundo" da lista, ou seja, para uma lista de tamanho n, um elemento que está inicialmente numa posição i e, para obter uma lista ordenada, ele deve ocupar a posição j, então ele terá que passar por todas as posições entre i e j.\cite{viana2015ordenaccao}.
 
 A Figura \ref{fig:bubblesort} apresenta a implementação do método bolha que consiste em dois laços de repetição sendo o mais externo o que determinará o total de iterações a ser realizada, enquanto o laco interno percorre a lista comparando os elementos e realizando as trocas iniciando em 0 até n - 1 - i, ou seja, a cada iteração o método estará ordenando uma lista menor uma vez que os items nas ultimas posições i do vetor já estão ordenados. Adicionalmente, é utilizada uma variável booleana \textit{swapped}, que permite identificar se houve alguma troca durante uma iteração. Caso nenhuma troca ocorra, conclui-se que a lista já está ordenada, permitindo a interrupção antecipada do algoritmo e evitando execuções desnecessárias.
 \begin{figure}[H]
@@ -280,19 +290,19 @@ Simplificando, obtemos:
 \frac{n(n-1)}{2}.
 \]
 
-Baseada em técnicas apresentadas em material de apoio da disciplina de estrutura de dados \cite{bigO2026} podemos aplicar a notação Big O:
+material de apoio da disciplina de estrutura de dados de \citeonline{bigO2026}, podemos aplicar a notação Big O:
 \[
 O(n^2 - n).
 \]
 
-Priorizando o termo de maior grau, é possivel concluir que a complexidade do método bolha no pior caso é:
+Priorizando o termo de maior grau, é possível concluir que a complexidade do método bolha no pior caso é:
 \[
 O(n^2).
 \]
 
 
 \subsection{Insertion sort}
-O método de insertion sort desloca vários elementos e insere um elemento na ordem correta. Nesse metodo cada interação consiste em inserir o elemento na sua ordem correta, percorrendo a lista da esquerda para direita. A Figura \ref{fig:insertionsort} apresenta a implementação do algoritmo de inserção. Primeiro obtem-se o número de elementos do vetor (n) então o laço de repetição percorre o vetor de 1 até n definindo a variavel numérica \textit{key} que é utilizada para realizar as comparações e j é a posição anterior a i. No laço de repetição interno verifica-se se j é maior ou igual a zero, ou seja, ainda não se chegou ao fim do vetor e se j é maior que a \textit{key} utilizada. Enquanto essa condição é valida, o elemento na posição j será movido para j + 1 e j é reduzido em uma unidade. Por fim, o elemento de interesse, \textit{key}, é introduzido na posição j + 1. 
+O método de Insertion Sort desloca vários elementos e insere um elemento na ordem correta. Nesse método cada interação consiste em inserir o elemento na sua ordem correta, percorrendo a lista da esquerda para direita. A Figura \ref{fig:insertionsort} apresenta a implementação do algoritmo de inserção. Primeiro obtem-se o número de elementos do vetor (n) então o laço de repetição percorre o vetor de 1 até n definindo a variavel numérica \textit{key} que é utilizada para realizar as comparações e j é a posição anterior a i. No laço de repetição interno verifica-se se j é maior ou igual a zero, ou seja, ainda não se chegou ao fim do vetor e se j é maior que a \textit{key} utilizada. Enquanto essa condição é valida, o elemento na posição j será movido para j + 1 e j é reduzido em uma unidade. Por fim, o elemento de interesse, \textit{key}, é introduzido na posição j + 1. 
 
 
 \begin{figure}[H]
@@ -363,12 +373,12 @@ Em notação Big O:
 O(n^2 - n).
 \]
 
-Priorizando o termo de maior grau, é possivel concluir que a complexidade do método de inserção no pior caso é:
+Priorizando o termo de maior grau, é possível concluir que a complexidade do método de inserção no pior caso é:
 \[
 O(n^2).
 \]
 \subsection{Selection Sort}
- O metodo de seleção ou \textit{selection sort} assim como o de inserção insere o elemento na posição correta a partir da seleção do elemento de maior prioridade. a figura \ref{fig:selectionsort} apresenta um exemplo de implementação desse metodo. 
+ O metodo de seleção ou \textit{Selection Sort} assim como o de inserção insere o elemento na posição correta a partir da seleção do elemento de maior prioridade. a figura \ref{fig:selectionsort} apresenta um exemplo de implementação desse metodo. 
 
 \begin{figure}[H]
 \centering
@@ -404,7 +414,7 @@ public:
 \label{fig:selectionsort}
 \end{figure}
 
-Ao analisar o método é possivel destacar como operações relevantes as operações de comparação e troca o que permite a análise complexidade do algoritmo sendo:
+Ao analisar o método é possível destacar como operações relevantes as operações de comparação e troca o que permite a análise complexidade do algoritmo sendo:
 para cada execução 
 \begin{equation}
 \begin{gathered}
@@ -435,14 +445,14 @@ Ao aplicar a notação Big O:
 O(n^2 - n).
 \]
 
-Priorizando o termo de maior grau, é possivel concluir que a complexidade do método de seleção no pior caso é:
+Priorizando o termo de maior grau, é possível concluir que a complexidade do método de seleção no pior caso é:
 \[
 O(n^2).
 \]
 
 \subsection{Merge Sort}
 
-O \textit{merge sort} soluciona o problema de ordenação a partir da divisão do vetor em duas partes de igual tamanho e ordena os subconjuntos para depois realizar a mesclagem ou \textit{merge} dos subconjuntos. A figura \ref{fig:mergesort} apresenta um exemplo de implementação do método de mesclagem.
+O Merge Sort soluciona o problema de ordenação a partir da divisão do vetor em duas partes de igual tamanho e ordena os subconjuntos para depois realizar a mesclagem ou \textit{merge} dos subconjuntos. A figura \ref{fig:mergesort} apresenta um exemplo de implementação do método.
 
 \begin{figure}[H]
 \centering
@@ -506,6 +516,101 @@ public:
 \caption{Implementação do Merge Sort em C++}
 \label{fig:mergesort}
 \end{figure}
+
+Analisando as relações de recorrência é possível observar que para o \textit{Merge Sort}:
+\[
+T(n)=2T\left(\frac{n}{2}\right)+n
+\]
+
+Ao realizar a expensão tem-se:
+\[
+T(n)=2\left(2T\left(\frac{n}{4}\right)+\frac{n}{2}\right)+n
+\]
+
+\[
+T(n)=4T\left(\frac{n}{4}\right)+2n
+\]
+
+\[
+T(n)=2^k T\left(\frac{n}{2^k}\right)+kn
+\]
+
+Sendo $n = 2^k$ e aplicando a notação O obtem-se a complexidade temporal:
+\[
+O(n\log n)
+\]
+
+\subsection{Quick Sort}
+De acordo com \citeonline{viana2015ordenaccao} é possívelmente o algoritmo mais utilizado uma vez que apresenta um desempenho frequentemente melhor que os demais algoritmos.O \textit{Quick Sort} também utiliza a estratégia de divisão do vetor a ser ordenado. A Figura \ref{fig:quicksort} apresenta a implementação do algoritmo:
+
+\begin{figure}[H]
+\centering
+\begin{lstlisting}[language=C++]
+class QuickSort {
+public:
+    QuickSort() {}
+    ~QuickSort() {}
+
+    int partition(std::vector<int> &arr, int low, int high) {
+        int pivot = arr[high];
+        int i = (low - 1);
+
+        for (int j = low; j <= high - 1; j++) {
+            if (arr[j] < pivot) {
+                i++;
+                std::swap(arr[i], arr[j]);
+            }
+        }
+        std::swap(arr[i + 1], arr[high]);
+        return (i + 1);
+    }
+
+    void sortRecursive(std::vector<int> &arr, int low, int high) {
+        if (low < high) {
+            int pi = partition(arr, low, high);
+
+            sortRecursive(arr, low, pi - 1);
+            sortRecursive(arr, pi + 1, high);
+        }
+    }
+
+    void sort(std::vector<int> &arr) {
+        if (!arr.empty()) {
+            sortRecursive(arr, 0, arr.size() - 1);
+        }
+    }
+};
+
+#endif // QUICK_SORT_H
+\end{lstlisting}
+\caption{Implementação do Quick Sort em C++}
+\label{fig:quicksort}
+\end{figure}
+
+Cabe ressaltar que em seu melhor caso e em seu caso médio o Quick Sort apresenta complexidade \(O(n \log n)\), porém  em casos extremos apresenta um desempenho bastante inferior. Seu pior caso ocorre quando o pivô selecionado esta nos extremos ocasionando uma partição desequilibrada, em que uma das divisões criadas estará vazia. A partir da analise de recorrência para o pior caso temos:
+\begin{equation}
+\begin{gathered}
+t(2) =  1 \\
+t(3) = 3 \\
+t(4) = 6 \\
+t(5) = 10 \\
+\vdots \\
+t(n-1) = n -1  \\
+\\
+T(n) = 1 + 2 + \cdots + (n - 1) \\
+\\
+T(n) = \sum_{i=1}^{n-1} i \\
+\end{gathered}
+\end{equation}
+
+Aplicando a fórmula da soma temos:
+\begin{equation}
+\begin{gathered}
+T(n) = \frac{(n^2-n)}2
+\end{gathered}
+\end{equation}
+Sendo o termo quadrático o termo dominante e removendo a constante a partir da aplicação da notação O temos que, no pior caso, a complexidade temporal é  $O(n^2)$.
+
 % ----------------------------------------------------------
 % Metodologia
 % ----------------------------------------------------------
@@ -514,10 +619,80 @@ public:
 \section{Metodologia}
 Foram elaborados testes para cada um dos algoritmos de ordenação estudados a partir de construção de um programa e de vetores de diferentes tamanhos iniciando de 5000 ate 20000, aumentando de 1000 em 1000 até obter o vetor de maior tamanho. A fim de analisar o tempo médio de execução de cada algoritmo estudado para cada tamanho de vetor, foram realizadas multiplas execuções com vetores preenchidos a partir de números aleatórios em um intervalo de 0 até 100000.
 
-\subsection{Projeto/Programa}
+\subsection{Arquitetura do Projeto}
 
-Descrever organização do projeto /libs etc 
+O código-fonte desenvolvido para a realização dos testes foi estruturado de maneira modular, visando a organização e facilidade de manutenção, e encontra-se integralmente disponível no repositório público do GitHub (\url{https://github.com/Jootiinha/uff-mestrado-estrutura-de-dados}). A arquitetura do projeto está dividida da seguinte forma:
 
+\begin{itemize}
+    \item \textbf{\texttt{libraries/}}: Diretório contendo os cabeçalhos (\texttt{.h}) com as implementações das classes de cada algoritmo de ordenação (\texttt{bubble\_sort.h}, \texttt{insertion\_sort.h}, \texttt{merge\_sort.h}, \texttt{quick\_sort.h}, \texttt{selection\_sort.h}). Também inclui arquivos auxiliares como \texttt{utils.h} (para geração e manipulação de vetores) e \texttt{timer.h} (para medição do tempo de execução).
+    \item \textbf{\texttt{benchmark.cpp}}: Script principal responsável por conduzir a bateria de testes. Ele gera os vetores aleatórios com tamanhos variando de 5000 a 20000, submete os mesmos vetores a cada um dos algoritmos e calcula as médias dos tempos de execução.
+    \item \textbf{\texttt{run.cpp}}: Script auxiliar utilizado para testes isolados e depuração, permitindo rodar um algoritmo específico para uma entrada de tamanho reduzido.
+    \item \textbf{\texttt{Makefile}}: Arquivo de automação de compilação estruturado com base em boas práticas e tutoriais da comunidade \cite{prof_eletrico_makefile, gist_makefile, so_makefile}. Gerencia as tarefas de limpeza, construção e execução dos testes de forma simplificada, possuindo alvos específicos como \texttt{make benchmark} e \texttt{make run}.
+    \item \textbf{\texttt{plot\_results.gp}}: Script de configuração do \textit{Gnuplot} responsável por ler os dados gerados (\texttt{averages.dat}) e plotar graficamente os resultados para análise visual.
+    \item \textbf{\texttt{results/}}: Diretório gerado dinamicamente onde são armazenados os arquivos de texto contendo os tempos aferidos de cada algoritmo, as médias unificadas e o gráfico final em formato PNG.
+\end{itemize}
+
+\subsection{Ambiente de Execução e Configurações}
+
+A fim de garantir a reprodutibilidade dos testes, é pertinente documentar o ambiente onde as execuções foram realizadas. Para a geração dos números aleatórios nos vetores de teste, a classe \texttt{Utils} oferece flexibilidade na escolha da semente (\textit{seed}). Por padrão, utiliza-se o horário atual do sistema por meio da função \texttt{time(NULL)}, o que garante amostragens diversificadas a cada nova rodada de testes. Contudo, a implementação também permite a parametrização manual de sementes específicas através da função \texttt{setSeed(unsigned int seed)}, possibilitando a reprodução exata dos mesmos cenários de dados, caso necessário.
+
+O código foi compilado utilizando a linguagem C++. A bateria de testes para a análise de desempenho foi conduzida em uma máquina com a seguinte configuração de hardware e sistema operacional:
+\begin{itemize}
+    \item \textbf{Sistema Operacional}: macOS 26.4.1
+    \item \textbf{Processador}: Apple M1 (8 núcleos)
+    \item \textbf{Memória RAM}: 8 GB
+\end{itemize}
+
+% ----------------------------------------------------------
+% Resultados
+% ----------------------------------------------------------
+\section{Resultados}
+
+Os tempos de execução computados pela bateria de testes para cada algoritmo em função dos variados tamanhos de vetores foram sumarizados no formato de gráfico de linhas, facilitando a análise visual comparativa de eficiência. 
+
+A Figura \ref{fig:chart} ilustra o crescimento do tempo de execução necessário para ordenar conjuntos aleatórios usando Bubble Sort, Insertion Sort, Selection Sort, Merge Sort e Quick Sort. Conforme esperado teoricamente, observa-se que os algoritmos de complexidade $O(N \log N)$ (como Merge Sort e Quick Sort) demonstram desempenho consideravelmente superior e um crescimento de tempo mais ameno, enquanto algoritmos de complexidade quadrática $O(N^2)$ (como Bubble Sort, Selection Sort e Insertion Sort) apresentam um rápido aumento no tempo gasto à medida que o tamanho dos dados cresce.
+
+Além da representação visual, os resultados pormenorizados encontram-se tabulados na Tabela \ref{tab:resultados_tempos}, apresentando o tempo médio em segundos aferidos para as ordenações, demonstrando de forma precisa a discrepância de performance entre os algoritmos para cada tamanho de vetor.
+
+\begin{table}[H]
+\centering
+\caption{Tempos médios de execução (em segundos) para os algoritmos de ordenação conforme o tamanho do vetor.}
+\label{tab:resultados_tempos}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{|c|c|c|c|c|c|}
+\hline
+\textbf{Tamanho} & \textbf{Bubble Sort} & \textbf{Insertion Sort} & \textbf{Merge Sort} & \textbf{Quick Sort} & \textbf{Selection Sort} \\ \hline
+5000 & 0.085770 & 0.022393 & 0.002708 & 0.000556 & 0.032035 \\ \hline
+6000 & 0.124771 & 0.031799 & 0.003143 & 0.000637 & 0.045849 \\ \hline
+7000 & 0.170338 & 0.043264 & 0.003688 & 0.000751 & 0.062429 \\ \hline
+8000 & 0.224126 & 0.056743 & 0.004263 & 0.000861 & 0.081530 \\ \hline
+9000 & 0.283887 & 0.073545 & 0.004871 & 0.001009 & 0.107243 \\ \hline
+10000 & 0.359882 & 0.089633 & 0.005427 & 0.001109 & 0.133639 \\ \hline
+11000 & 0.436591 & 0.118171 & 0.006282 & 0.001261 & 0.158888 \\ \hline
+12000 & 0.531721 & 0.131462 & 0.006614 & 0.001374 & 0.185986 \\ \hline
+13000 & 0.606819 & 0.154374 & 0.007208 & 0.001503 & 0.224287 \\ \hline
+14000 & 0.712632 & 0.176343 & 0.007765 & 0.001625 & 0.263089 \\ \hline
+15000 & 0.832419 & 0.202063 & 0.008396 & 0.001776 & 0.291281 \\ \hline
+16000 & 0.930234 & 0.229426 & 0.008903 & 0.001878 & 0.329183 \\ \hline
+17000 & 1.056640 & 0.262985 & 0.009514 & 0.002038 & 0.372751 \\ \hline
+18000 & 1.182700 & 0.297232 & 0.010240 & 0.002175 & 0.418497 \\ \hline
+19000 & 1.325620 & 0.327531 & 0.010727 & 0.002282 & 0.471194 \\ \hline
+20000 & 1.466410 & 0.366193 & 0.011327 & 0.002412 & 0.520886 \\ \hline
+\end{tabular}%
+}
+\end{table}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{results/chart.png}
+    \caption{Comparação do tempo de execução dos algoritmos de ordenação em função do tamanho do vetor.}
+    \label{fig:chart}
+\end{figure}
+
+\noindent
+\fcolorbox{gray}{yellow!20}{\parbox{\linewidth}{
+\textbf{Nota:} Inserir gráfico do quick e Merge Sort e comentar
+}}
 % Finaliza a parte no bookmark do PDF, para que se inicie o bookmark na raiz
 % ---
 \bookmarksetup{startatroot}% 
