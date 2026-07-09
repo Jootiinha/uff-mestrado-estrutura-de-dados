@@ -30,3 +30,5 @@ clean:
 	rm -f run benchmark
 	rm -rf $(BIN_DIR)
 	rm -rf results
+	rm run
+	rm benchmark
