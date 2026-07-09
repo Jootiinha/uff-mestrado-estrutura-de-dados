@@ -1,6 +1,15 @@
 CXX = g++
 CXXFLAGS = -Wall -std=c++17 -Ilibraries
-OPENMP_FLAGS ?=
+UNAME_S := $(shell uname -s)
+LIBOMP_PREFIX := $(shell brew --prefix libomp 2>/dev/null)
+
+ifeq ($(UNAME_S),Darwin)
+  ifneq ($(LIBOMP_PREFIX),)
+    DEFAULT_OPENMP_FLAGS = -Xpreprocessor -fopenmp -I$(LIBOMP_PREFIX)/include -L$(LIBOMP_PREFIX)/lib -lomp
+  endif
+endif
+
+OPENMP_FLAGS ?= $(DEFAULT_OPENMP_FLAGS)
 BIN_DIR = execs
 
 .PHONY: all run benchmark plot clean
