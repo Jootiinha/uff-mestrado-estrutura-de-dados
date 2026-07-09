@@ -83,13 +83,7 @@ int main() {
   rows.reserve(sizes.size());
 
   cout << "Iniciando benchmark oficial..." << '\n';
-#ifdef _OPENMP
   cout << "OpenMP: habilitado em compilacao." << '\n';
-#else
-  cout << "OpenMP: indisponivel neste ambiente; coluna openmp refletira o "
-          "fallback sequencial."
-       << '\n';
-#endif
 
   for (size_t size_index = 0; size_index < sizes.size(); ++size_index) {
     const int size = sizes[size_index];

@@ -344,7 +344,6 @@ run_openmp(const std::vector<int> &data,
   execution.blocks_before_sort = partition_blocks(data, seed);
   execution.blocks_after_sort = execution.blocks_before_sort;
 
-#ifdef _OPENMP
 #pragma omp parallel for
   for (int i = 0; i < static_cast<int>(execution.blocks_after_sort.size()); ++i) {
     auto &block = execution.blocks_after_sort[static_cast<size_t>(i)];
@@ -353,14 +352,6 @@ run_openmp(const std::vector<int> &data,
                                 : combination.odd_block;
     apply_algorithm(block, block_algorithm);
   }
-#else
-  for (auto &block : execution.blocks_after_sort) {
-    const BlockSortAlgorithm block_algorithm =
-        (block.size() % 2 == 0) ? combination.even_block
-                                : combination.odd_block;
-    apply_algorithm(block, block_algorithm);
-  }
-#endif
 
   execution.result =
       merge_blocks(execution.blocks_after_sort, combination.final_stage);

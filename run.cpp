@@ -93,13 +93,7 @@ int main(int argc, char *argv[]) {
 
   cout << "Executando algoritmo sequencial por blocos com " << size
        << " elementos e seed " << seed << "." << '\n';
-#ifdef _OPENMP
   cout << "OpenMP: habilitado em compilacao." << '\n';
-#else
-  cout << "OpenMP: indisponivel neste ambiente de compilacao; execucao cai no "
-          "mesmo fluxo sequencial."
-       << '\n';
-#endif
   cout << "Combinacoes validas encontradas: " << ranking.size() << '\n';
   cout << "Melhor combinacao automatica: "
        << BlockSort::combination_name(best.combination) << '\n';

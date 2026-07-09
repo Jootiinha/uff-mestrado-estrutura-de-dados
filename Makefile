@@ -2,11 +2,10 @@ CXX = g++
 CXXFLAGS = -Wall -std=c++17 -Ilibraries
 UNAME_S := $(shell uname -s)
 LIBOMP_PREFIX := $(shell brew --prefix libomp 2>/dev/null)
+DEFAULT_OPENMP_FLAGS = -fopenmp
 
 ifeq ($(UNAME_S),Darwin)
-  ifneq ($(LIBOMP_PREFIX),)
-    DEFAULT_OPENMP_FLAGS = -Xpreprocessor -fopenmp -I$(LIBOMP_PREFIX)/include -L$(LIBOMP_PREFIX)/lib -lomp
-  endif
+  DEFAULT_OPENMP_FLAGS = -Xpreprocessor -fopenmp -I$(LIBOMP_PREFIX)/include -L$(LIBOMP_PREFIX)/lib -lomp
 endif
 
 OPENMP_FLAGS ?= $(DEFAULT_OPENMP_FLAGS)
