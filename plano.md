@@ -348,42 +348,42 @@ Não reaproveitar como está:
 
 ### Fase 1
 
-- validar e reaproveitar os algoritmos candidatos já existentes;
-- implementar versão sequencial correta;
-- validar partição em blocos 4/5;
-- validar ordenação de cada bloco;
-- validar merge final.
+- [x] validar e reaproveitar os algoritmos candidatos já existentes;
+- [x] implementar versão sequencial correta;
+- [x] validar partição em blocos 4/5;
+- [x] validar ordenação de cada bloco;
+- [x] validar merge final.
 
 ### Fase 2
 
-- implementar a geração das combinações válidas;
-- implementar o benchmark inicial com `std::chrono`;
-- selecionar automaticamente a combinação vencedora;
-- comparar as combinações e registrar a escolhida.
+- [x] implementar a geração das combinações válidas;
+- [x] implementar o benchmark inicial com `std::chrono`;
+- [x] selecionar automaticamente a combinação vencedora;
+- [x] comparar as combinações e registrar a escolhida.
 
 ### Fase 3
 
-- extrair a ordenação dos blocos para função reutilizável;
-- criar versão paralela com `std::thread`;
-- comparar resultado com a versão sequencial.
+- [x] extrair a ordenação dos blocos para função reutilizável;
+- [x] criar versão paralela com `std::thread`;
+- [x] comparar resultado com a versão sequencial.
 
 ### Fase 4
 
-- criar versão paralela com `OpenMP`;
-- comparar resultado com a versão sequencial.
+- [x] criar versão paralela com `OpenMP`;
+- [x] comparar resultado com a versão sequencial.
 
 ### Fase 5
 
-- implementar o benchmark obrigatório dos tamanhos `15000` a `20000`;
-- gerar 30 vetores aleatórios por tamanho;
-- medir as três versões com os mesmos vetores;
-- salvar as médias em `results/`.
+- [x] implementar o benchmark obrigatório dos tamanhos `15000` a `20000`;
+- [x] gerar 30 vetores aleatórios por tamanho;
+- [x] medir as três versões com os mesmos vetores;
+- [x] salvar as médias em `results/`.
 
 ### Fase 6
 
-- remover ou sobrescrever o benchmark antigo que compara sorts isolados;
-- ajustar `plot_results.gp` apenas se ele continuar útil para os novos dados;
-- limpar artefatos antigos de `results/` se estiverem confundindo os resultados novos.
+- [x] remover ou sobrescrever o benchmark antigo que compara sorts isolados;
+- [x] ajustar `plot_results.gp` apenas se ele continuar útil para os novos dados;
+- [x] limpar artefatos antigos de `results/` se estiverem confundindo os resultados novos.
 
 ## Validação mínima
 

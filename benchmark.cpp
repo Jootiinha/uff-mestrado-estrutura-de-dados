@@ -1,101 +1,143 @@
+#include <chrono>
+#include <filesystem>
 #include <fstream>
+#include <iomanip>
 #include <iostream>
-#include <string>
-#include <sys/stat.h>
-#include <sys/types.h>
+#include <stdexcept>
 #include <vector>
 
-#include "libraries/bubble_sort.h"
-#include "libraries/insertion_sort.h"
-#include "libraries/merge_sort.h"
-#include "libraries/quick_sort.h"
-#include "libraries/selection_sort.h"
-#include "libraries/timer.h"
-#include "libraries/utils.h"
+#include "libraries/block_sort.hpp"
 
 using namespace std;
 
-void createDirectory(const string &path) {
-  string command = "mkdir -p " + path;
-  system(command.c_str());
+struct BenchmarkRow {
+  int size = 0;
+  BlockSortCombination combination;
+  double sequential_seconds = 0.0;
+  double threads_seconds = 0.0;
+  double openmp_seconds = 0.0;
+};
+
+double average_runtime(BlockSortMode mode, const vector<vector<int>> &inputs,
+                       const BlockSortCombination &combination,
+                       uint32_t partition_seed_base) {
+  using Clock = chrono::high_resolution_clock;
+
+  double total_seconds = 0.0;
+
+  for (size_t i = 0; i < inputs.size(); ++i) {
+    const uint32_t seed = partition_seed_base + static_cast<uint32_t>(i);
+    const auto start = Clock::now();
+    const BlockSortExecution execution =
+        BlockSort::run_mode(mode, inputs[i], combination, seed);
+    const auto end = Clock::now();
+
+    if (!BlockSort::are_valid_block_sizes(execution.blocks_before_sort) ||
+        !BlockSort::is_sorted_non_decreasing(execution.result) ||
+        !BlockSort::preserves_elements(inputs[i], execution.result)) {
+      throw logic_error(string("Invalid result while benchmarking mode: ") +
+                        BlockSort::mode_name(mode));
+    }
+
+    total_seconds += chrono::duration<double>(end - start).count();
+  }
+
+  return total_seconds / static_cast<double>(inputs.size());
+}
+
+void write_results_csv(const vector<BenchmarkRow> &rows,
+                       const filesystem::path &path) {
+  ofstream out(path);
+  out << "size,sequential_seconds,threads_seconds,openmp_seconds,best_combination\n";
+
+  for (const auto &row : rows) {
+    out << row.size << ',' << fixed << setprecision(8) << row.sequential_seconds
+        << ',' << row.threads_seconds << ',' << row.openmp_seconds << ",\""
+        << BlockSort::combination_name(row.combination) << "\"\n";
+  }
+}
+
+void write_results_dat(const vector<BenchmarkRow> &rows,
+                       const filesystem::path &path) {
+  ofstream out(path);
+  out << "# size sequential threads openmp\n";
+
+  for (const auto &row : rows) {
+    out << row.size << ' ' << fixed << setprecision(8) << row.sequential_seconds
+        << ' ' << row.threads_seconds << ' ' << row.openmp_seconds << '\n';
+  }
 }
 
 int main() {
-  Utils utils;
-  vector<int> sizes;
-  for (int s = 5000; s <= 20000; s += 1000) {
-    sizes.push_back(s);
-  }
-
+  const vector<int> sizes = {15000, 16000, 17000, 18000, 19000, 20000};
   const int iterations = 30;
-  const int max_val = 100000;
+  const int selection_iterations = 5;
+  const int selection_size = 2000;
+  const int max_value = 100000;
+  const uint32_t input_seed_base = 20260709;
+  const uint32_t partition_seed_base = 91000;
 
-  vector<string> algos = {"bubble_sort", "insertion_sort", "merge_sort",
-                          "quick_sort", "selection_sort"};
+  filesystem::create_directories("results");
 
-  ofstream summaryFile("results/averages.dat");
-  summaryFile << "# Size bubble_sort insertion_sort merge_sort quick_sort "
-                 "selection_sort"
-              << endl;
+  vector<BenchmarkRow> rows;
+  rows.reserve(sizes.size());
 
-  cout << "Iniciando benchmarking..." << endl;
+  cout << "Iniciando benchmark oficial..." << '\n';
+#ifdef _OPENMP
+  cout << "OpenMP: habilitado em compilacao." << '\n';
+#else
+  cout << "OpenMP: indisponivel neste ambiente; coluna openmp refletira o "
+          "fallback sequencial."
+       << '\n';
+#endif
 
-  for (int size : sizes) {
-    cout << "Testando tamanho: " << size << "..." << endl;
+  for (size_t size_index = 0; size_index < sizes.size(); ++size_index) {
+    const int size = sizes[size_index];
+    const uint32_t input_seed = input_seed_base + static_cast<uint32_t>(size_index);
+    const uint32_t partition_seed =
+        partition_seed_base + static_cast<uint32_t>(size_index * 1000);
 
-    vector<vector<int>> base_vectors(iterations);
-    for (int i = 0; i < iterations; i++) {
-      utils.preencherVetor(base_vectors[i], size, max_val);
-    }
+    cout << "Tamanho " << size << ": gerando " << iterations
+         << " vetores base..." << '\n';
 
-    vector<double> avg_times;
+    const auto inputs =
+        BlockSort::make_benchmark_inputs(size, iterations, max_value, input_seed);
+    const auto selection_inputs = BlockSort::make_benchmark_inputs(
+        selection_size, selection_iterations, max_value, input_seed + 500);
 
-    for (const string &algo : algos) {
-      cout << "  Executando " << algo << "... " << flush;
+    cout << "Tamanho " << size << ": escolhendo melhor combinacao..." << '\n';
+    const BlockSortBenchmarkSummary best =
+        BlockSort::select_best_combination(selection_inputs, partition_seed);
 
-      string algo_dir = "results/" + algo;
-      createDirectory(algo_dir);
-      string file_path = algo_dir + "/exer_" + to_string(size) + ".txt";
-      ofstream individualFile(file_path);
+    cout << "  Melhor combinacao: "
+         << BlockSort::combination_name(best.combination) << '\n';
+    cout << "  Tempo medio da selecao: " << best.average_seconds << " s" << '\n';
 
-      double total_time = 0;
+    BenchmarkRow row;
+    row.size = size;
+    row.combination = best.combination;
 
-      for (int i = 0; i < iterations; i++) {
-        vector<int> data = base_vectors[i];
-        Timer t;
+    row.sequential_seconds = average_runtime(BlockSortMode::Sequential, inputs,
+                                             row.combination, partition_seed);
+    row.threads_seconds = average_runtime(BlockSortMode::Threads, inputs,
+                                          row.combination, partition_seed);
+    row.openmp_seconds = average_runtime(BlockSortMode::OpenMP, inputs,
+                                         row.combination, partition_seed);
 
-        if (algo == "bubble_sort") {
-          BubbleSort().sort(data);
-        } else if (algo == "insertion_sort") {
-          InsertionSort().sort(data);
-        } else if (algo == "merge_sort") {
-          MergeSort().sort(data);
-        } else if (algo == "quick_sort") {
-          QuickSort().sort(data);
-        } else if (algo == "selection_sort") {
-          SelectionSort().sort(data);
-        }
+    cout << "  Medias:" << '\n';
+    cout << "  - sequencial: " << row.sequential_seconds << " s" << '\n';
+    cout << "  - std::thread: " << row.threads_seconds << " s" << '\n';
+    cout << "  - openmp: " << row.openmp_seconds << " s" << '\n';
 
-        double elapsed = t.stop()[0];
-        total_time += elapsed;
-        individualFile << elapsed << endl;
-      }
-
-      double avg = total_time / iterations;
-      avg_times.push_back(avg);
-      individualFile.close();
-      cout << "Média: " << avg << "s" << endl;
-    }
-
-    summaryFile << size;
-    for (double t : avg_times) {
-      summaryFile << " " << t;
-    }
-    summaryFile << endl;
+    rows.push_back(row);
+    write_results_csv(rows, "results/benchmark_results.csv");
+    write_results_dat(rows, "results/averages.dat");
   }
 
-  summaryFile.close();
-  cout << "Benchmarking concluído! Resultados em results/" << endl;
+  cout << "Benchmark concluido." << '\n';
+  cout << "Arquivos gerados:" << '\n';
+  cout << "- results/benchmark_results.csv" << '\n';
+  cout << "- results/averages.dat" << '\n';
 
   return 0;
 }
