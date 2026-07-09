@@ -51,7 +51,7 @@ struct BlockSortExecution {
 namespace BlockSort {
 
 inline bool are_valid_block_sizes(const std::vector<std::vector<int>> &blocks);
-inline bool is_sorted_non_decreasing(const std::vector<int> &data);
+inline bool is_sorted_non_decreasing(const std::vector<int> &values);
 inline bool preserves_elements(const std::vector<int> &original,
                                const std::vector<int> &result);
 
@@ -86,30 +86,31 @@ inline const char *mode_name(BlockSortMode mode) {
 }
 
 inline std::string combination_name(const BlockSortCombination &combination) {
-  std::ostringstream out;
-  out << "pares=" << algorithm_name(combination.even_block)
-      << ", impares=" << algorithm_name(combination.odd_block)
-      << ", final=" << algorithm_name(combination.final_stage);
-  return out.str();
+  std::ostringstream description;
+  description << "pares=" << algorithm_name(combination.even_block)
+              << ", impares=" << algorithm_name(combination.odd_block)
+              << ", final=" << algorithm_name(combination.final_stage);
+  return description.str();
 }
 
 inline bool is_valid_combination(const BlockSortCombination &combination) {
-  const bool even_ok =
+  const bool even_algorithm_is_allowed =
       combination.even_block == BlockSortAlgorithm::SelectionSort ||
       combination.even_block == BlockSortAlgorithm::MergeSort ||
       combination.even_block == BlockSortAlgorithm::InsertionSort;
 
-  const bool odd_ok =
+  const bool odd_algorithm_is_allowed =
       combination.odd_block == BlockSortAlgorithm::SelectionSort ||
       combination.odd_block == BlockSortAlgorithm::MergeSort ||
       combination.odd_block == BlockSortAlgorithm::BubbleSort;
 
-  const bool final_ok =
+  const bool final_algorithm_is_allowed =
       combination.final_stage == BlockSortAlgorithm::InsertionSort ||
       combination.final_stage == BlockSortAlgorithm::MergeSort ||
       combination.final_stage == BlockSortAlgorithm::QuickSort;
 
-  if (!even_ok || !odd_ok || !final_ok) {
+  if (!even_algorithm_is_allowed || !odd_algorithm_is_allowed ||
+      !final_algorithm_is_allowed) {
     return false;
   }
 
@@ -146,160 +147,168 @@ inline std::vector<BlockSortCombination> valid_combinations() {
   return combinations;
 }
 
-inline bool can_partition_into_blocks_4_or_5(int n) {
-  if (n < 0) {
+inline bool can_partition_into_blocks_4_or_5(int total_size) {
+  if (total_size < 0) {
     return false;
   }
 
-  std::vector<bool> dp(static_cast<size_t>(n) + 1, false);
-  dp[0] = true;
+  std::vector<bool> reachable_sizes(static_cast<size_t>(total_size) + 1, false);
+  reachable_sizes[0] = true;
 
-  for (int i = 0; i <= n; ++i) {
-    if (!dp[static_cast<size_t>(i)]) {
+  for (int current_size = 0; current_size <= total_size; ++current_size) {
+    if (!reachable_sizes[static_cast<size_t>(current_size)]) {
       continue;
     }
-    if (i + 4 <= n) {
-      dp[static_cast<size_t>(i + 4)] = true;
+    if (current_size + 4 <= total_size) {
+      reachable_sizes[static_cast<size_t>(current_size + 4)] = true;
     }
-    if (i + 5 <= n) {
-      dp[static_cast<size_t>(i + 5)] = true;
+    if (current_size + 5 <= total_size) {
+      reachable_sizes[static_cast<size_t>(current_size + 5)] = true;
     }
   }
 
-  return dp[static_cast<size_t>(n)];
+  return reachable_sizes[static_cast<size_t>(total_size)];
 }
 
 inline std::vector<std::vector<int>>
-partition_blocks(const std::vector<int> &data, std::uint32_t seed) {
-  if (!can_partition_into_blocks_4_or_5(static_cast<int>(data.size()))) {
+partition_blocks(const std::vector<int> &values, std::uint32_t seed) {
+  if (!can_partition_into_blocks_4_or_5(static_cast<int>(values.size()))) {
     throw std::invalid_argument(
         "Input size cannot be partitioned into blocks of 4 or 5.");
   }
 
-  std::mt19937 rng(seed);
+  std::mt19937 random_engine(seed);
   std::vector<std::vector<int>> blocks;
-  size_t index = 0;
+  size_t next_value_index = 0;
 
-  while (index < data.size()) {
-    const int remaining = static_cast<int>(data.size() - index);
-    std::vector<int> valid_sizes;
+  while (next_value_index < values.size()) {
+    const int remaining_values =
+        static_cast<int>(values.size() - next_value_index);
+    std::vector<int> candidate_block_sizes;
 
     for (int candidate : {4, 5}) {
-      if (remaining >= candidate &&
-          can_partition_into_blocks_4_or_5(remaining - candidate)) {
-        valid_sizes.push_back(candidate);
+      if (remaining_values >= candidate &&
+          can_partition_into_blocks_4_or_5(remaining_values - candidate)) {
+        candidate_block_sizes.push_back(candidate);
       }
     }
 
-    if (valid_sizes.empty()) {
+    if (candidate_block_sizes.empty()) {
       throw std::logic_error("Failed to build a valid partition.");
     }
 
-    std::uniform_int_distribution<size_t> dist(0, valid_sizes.size() - 1);
-    const int block_size = valid_sizes[dist(rng)];
+    std::uniform_int_distribution<size_t> block_size_distribution(
+        0, candidate_block_sizes.size() - 1);
+    const int block_size =
+        candidate_block_sizes[block_size_distribution(random_engine)];
 
-    blocks.emplace_back(data.begin() + static_cast<long>(index),
-                        data.begin() + static_cast<long>(index + block_size));
-    index += static_cast<size_t>(block_size);
+    blocks.emplace_back(
+        values.begin() + static_cast<long>(next_value_index),
+        values.begin() + static_cast<long>(next_value_index + block_size));
+    next_value_index += static_cast<size_t>(block_size);
   }
 
   return blocks;
 }
 
-inline void apply_algorithm(std::vector<int> &data, BlockSortAlgorithm algo) {
-  switch (algo) {
+inline void apply_algorithm(std::vector<int> &values,
+                            BlockSortAlgorithm algorithm) {
+  switch (algorithm) {
   case BlockSortAlgorithm::InsertionSort:
-    InsertionSort().sort(data);
+    InsertionSort().sort(values);
     return;
   case BlockSortAlgorithm::SelectionSort:
-    SelectionSort().sort(data);
+    SelectionSort().sort(values);
     return;
   case BlockSortAlgorithm::BubbleSort:
-    BubbleSort().sort(data);
+    BubbleSort().sort(values);
     return;
   case BlockSortAlgorithm::MergeSort:
-    MergeSort().sort(data);
+    MergeSort().sort(values);
     return;
   case BlockSortAlgorithm::QuickSort:
-    QuickSort().sort(data);
+    QuickSort().sort(values);
     return;
   }
 }
 
-inline std::vector<int> merge_two_sorted_vectors(const std::vector<int> &left,
-                                                 const std::vector<int> &right) {
+inline std::vector<int>
+merge_two_sorted_vectors(const std::vector<int> &left_values,
+                         const std::vector<int> &right_values) {
   std::vector<int> merged;
-  merged.reserve(left.size() + right.size());
+  merged.reserve(left_values.size() + right_values.size());
 
-  size_t i = 0;
-  size_t j = 0;
+  size_t left_index = 0;
+  size_t right_index = 0;
 
-  while (i < left.size() && j < right.size()) {
-    if (left[i] <= right[j]) {
-      merged.push_back(left[i++]);
+  while (left_index < left_values.size() &&
+         right_index < right_values.size()) {
+    if (left_values[left_index] <= right_values[right_index]) {
+      merged.push_back(left_values[left_index++]);
     } else {
-      merged.push_back(right[j++]);
+      merged.push_back(right_values[right_index++]);
     }
   }
 
-  while (i < left.size()) {
-    merged.push_back(left[i++]);
+  while (left_index < left_values.size()) {
+    merged.push_back(left_values[left_index++]);
   }
-  while (j < right.size()) {
-    merged.push_back(right[j++]);
+  while (right_index < right_values.size()) {
+    merged.push_back(right_values[right_index++]);
   }
 
   return merged;
 }
 
 inline std::vector<int>
-merge_blocks(std::vector<std::vector<int>> blocks,
+merge_blocks(std::vector<std::vector<int>> sorted_blocks,
              BlockSortAlgorithm final_stage_algorithm) {
-  if (blocks.empty()) {
+  if (sorted_blocks.empty()) {
     return {};
   }
 
   if (final_stage_algorithm == BlockSortAlgorithm::MergeSort) {
-    while (blocks.size() > 1) {
-      std::vector<std::vector<int>> next_level;
-      next_level.reserve((blocks.size() + 1) / 2);
+    while (sorted_blocks.size() > 1) {
+      std::vector<std::vector<int>> merged_block_level;
+      merged_block_level.reserve((sorted_blocks.size() + 1) / 2);
 
-      for (size_t i = 0; i < blocks.size(); i += 2) {
-        if (i + 1 == blocks.size()) {
-          next_level.push_back(blocks[i]);
+      for (size_t block_index = 0; block_index < sorted_blocks.size();
+           block_index += 2) {
+        if (block_index + 1 == sorted_blocks.size()) {
+          merged_block_level.push_back(sorted_blocks[block_index]);
         } else {
-          next_level.push_back(
-              merge_two_sorted_vectors(blocks[i], blocks[i + 1]));
+          merged_block_level.push_back(merge_two_sorted_vectors(
+              sorted_blocks[block_index], sorted_blocks[block_index + 1]));
         }
       }
 
-      blocks = std::move(next_level);
+      sorted_blocks = std::move(merged_block_level);
     }
 
-    return blocks.front();
+    return sorted_blocks.front();
   }
 
-  std::vector<int> flattened;
-  for (const auto &block : blocks) {
-    flattened.insert(flattened.end(), block.begin(), block.end());
+  std::vector<int> flattened_values;
+  for (const auto &block : sorted_blocks) {
+    flattened_values.insert(flattened_values.end(), block.begin(), block.end());
   }
 
-  apply_algorithm(flattened, final_stage_algorithm);
-  return flattened;
+  apply_algorithm(flattened_values, final_stage_algorithm);
+  return flattened_values;
 }
 
 inline BlockSortExecution
-run_sequential(const std::vector<int> &data,
+run_sequential(const std::vector<int> &values,
                const BlockSortCombination &combination = {},
                std::uint32_t seed = std::random_device{}()) {
   BlockSortExecution execution;
-  execution.blocks_before_sort = partition_blocks(data, seed);
+  execution.blocks_before_sort = partition_blocks(values, seed);
   execution.blocks_after_sort = execution.blocks_before_sort;
 
   for (auto &block : execution.blocks_after_sort) {
-    const BlockSortAlgorithm block_algorithm =
+    const BlockSortAlgorithm selected_block_algorithm =
         (block.size() % 2 == 0) ? combination.even_block : combination.odd_block;
-    apply_algorithm(block, block_algorithm);
+    apply_algorithm(block, selected_block_algorithm);
   }
 
   execution.result =
@@ -308,11 +317,11 @@ run_sequential(const std::vector<int> &data,
 }
 
 inline BlockSortExecution
-run_threads(const std::vector<int> &data,
+run_threads(const std::vector<int> &values,
             const BlockSortCombination &combination = {},
             std::uint32_t seed = std::random_device{}()) {
   BlockSortExecution execution;
-  execution.blocks_before_sort = partition_blocks(data, seed);
+  execution.blocks_before_sort = partition_blocks(values, seed);
   execution.blocks_after_sort = execution.blocks_before_sort;
 
   std::vector<std::thread> workers;
@@ -320,10 +329,10 @@ run_threads(const std::vector<int> &data,
 
   for (auto &block : execution.blocks_after_sort) {
     workers.emplace_back([&block, &combination]() {
-      const BlockSortAlgorithm block_algorithm =
+      const BlockSortAlgorithm selected_block_algorithm =
           (block.size() % 2 == 0) ? combination.even_block
                                   : combination.odd_block;
-      apply_algorithm(block, block_algorithm);
+      apply_algorithm(block, selected_block_algorithm);
     });
   }
 
@@ -337,20 +346,23 @@ run_threads(const std::vector<int> &data,
 }
 
 inline BlockSortExecution
-run_openmp(const std::vector<int> &data,
+run_openmp(const std::vector<int> &values,
            const BlockSortCombination &combination = {},
            std::uint32_t seed = std::random_device{}()) {
   BlockSortExecution execution;
-  execution.blocks_before_sort = partition_blocks(data, seed);
+  execution.blocks_before_sort = partition_blocks(values, seed);
   execution.blocks_after_sort = execution.blocks_before_sort;
 
 #pragma omp parallel for
-  for (int i = 0; i < static_cast<int>(execution.blocks_after_sort.size()); ++i) {
-    auto &block = execution.blocks_after_sort[static_cast<size_t>(i)];
-    const BlockSortAlgorithm block_algorithm =
+  for (int block_index = 0;
+       block_index < static_cast<int>(execution.blocks_after_sort.size());
+       ++block_index) {
+    auto &block =
+        execution.blocks_after_sort[static_cast<size_t>(block_index)];
+    const BlockSortAlgorithm selected_block_algorithm =
         (block.size() % 2 == 0) ? combination.even_block
                                 : combination.odd_block;
-    apply_algorithm(block, block_algorithm);
+    apply_algorithm(block, selected_block_algorithm);
   }
 
   execution.result =
@@ -359,16 +371,16 @@ run_openmp(const std::vector<int> &data,
 }
 
 inline BlockSortExecution
-run_mode(BlockSortMode mode, const std::vector<int> &data,
+run_mode(BlockSortMode mode, const std::vector<int> &values,
          const BlockSortCombination &combination = {},
          std::uint32_t seed = std::random_device{}()) {
   switch (mode) {
   case BlockSortMode::Sequential:
-    return run_sequential(data, combination, seed);
+    return run_sequential(values, combination, seed);
   case BlockSortMode::Threads:
-    return run_threads(data, combination, seed);
+    return run_threads(values, combination, seed);
   case BlockSortMode::OpenMP:
-    return run_openmp(data, combination, seed);
+    return run_openmp(values, combination, seed);
   }
 
   throw std::logic_error("Unknown block sort mode.");
@@ -377,60 +389,60 @@ run_mode(BlockSortMode mode, const std::vector<int> &data,
 inline std::vector<std::vector<int>>
 make_benchmark_inputs(int size, int sample_count, int max_value,
                       std::uint32_t seed) {
-  std::mt19937 rng(seed);
-  std::uniform_int_distribution<int> dist(0, max_value);
+  std::mt19937 random_engine(seed);
+  std::uniform_int_distribution<int> value_distribution(0, max_value);
 
-  std::vector<std::vector<int>> inputs(static_cast<size_t>(sample_count),
-                                       std::vector<int>(static_cast<size_t>(size)));
+  std::vector<std::vector<int>> samples(
+      static_cast<size_t>(sample_count),
+      std::vector<int>(static_cast<size_t>(size)));
 
-  for (auto &input : inputs) {
-    for (int &value : input) {
-      value = dist(rng);
+  for (auto &sample : samples) {
+    for (int &value : sample) {
+      value = value_distribution(random_engine);
     }
   }
 
-  return inputs;
+  return samples;
 }
 
 inline double benchmark_combination(
     const BlockSortCombination &combination,
-    const std::vector<std::vector<int>> &inputs, std::uint32_t partition_seed) {
+    const std::vector<std::vector<int>> &samples, std::uint32_t partition_seed) {
   using Clock = std::chrono::high_resolution_clock;
 
   double total_seconds = 0.0;
-  std::uint32_t current_seed = partition_seed;
+  std::uint32_t current_partition_seed = partition_seed;
 
-  for (const auto &input : inputs) {
-    const auto start = Clock::now();
+  for (const auto &sample : samples) {
+    const auto start_time = Clock::now();
     const BlockSortExecution execution =
-        run_sequential(input, combination, current_seed++);
-    const auto end = Clock::now();
+        run_sequential(sample, combination, current_partition_seed++);
+    const auto end_time = Clock::now();
 
     if (!are_valid_block_sizes(execution.blocks_before_sort) ||
         !is_sorted_non_decreasing(execution.result) ||
-        !preserves_elements(input, execution.result)) {
+        !preserves_elements(sample, execution.result)) {
       throw std::logic_error("Invalid result during combination benchmark.");
     }
 
-    total_seconds +=
-        std::chrono::duration<double>(end - start).count();
+    total_seconds += std::chrono::duration<double>(end_time - start_time).count();
   }
 
-  if (inputs.empty()) {
+  if (samples.empty()) {
     return 0.0;
   }
 
-  return total_seconds / static_cast<double>(inputs.size());
+  return total_seconds / static_cast<double>(samples.size());
 }
 
 inline std::vector<BlockSortBenchmarkSummary>
-rank_combinations(const std::vector<std::vector<int>> &inputs,
+rank_combinations(const std::vector<std::vector<int>> &samples,
                   std::uint32_t partition_seed) {
   std::vector<BlockSortBenchmarkSummary> ranking;
 
   for (const auto &combination : valid_combinations()) {
     ranking.push_back({combination,
-                       benchmark_combination(combination, inputs,
+                       benchmark_combination(combination, samples,
                                              partition_seed)});
   }
 
@@ -444,9 +456,9 @@ rank_combinations(const std::vector<std::vector<int>> &inputs,
 }
 
 inline BlockSortBenchmarkSummary
-select_best_combination(const std::vector<std::vector<int>> &inputs,
+select_best_combination(const std::vector<std::vector<int>> &samples,
                         std::uint32_t partition_seed) {
-  const auto ranking = rank_combinations(inputs, partition_seed);
+  const auto ranking = rank_combinations(samples, partition_seed);
   if (ranking.empty()) {
     throw std::logic_error("No valid block sort combinations found.");
   }
@@ -473,11 +485,11 @@ inline bool preserves_elements(const std::vector<int> &original,
     return false;
   }
 
-  std::vector<int> left = original;
-  std::vector<int> right = result;
-  std::sort(left.begin(), left.end());
-  std::sort(right.begin(), right.end());
-  return left == right;
+  std::vector<int> sorted_original_values = original;
+  std::vector<int> sorted_result_values = result;
+  std::sort(sorted_original_values.begin(), sorted_original_values.end());
+  std::sort(sorted_result_values.begin(), sorted_result_values.end());
+  return sorted_original_values == sorted_result_values;
 }
 
 } // namespace BlockSort

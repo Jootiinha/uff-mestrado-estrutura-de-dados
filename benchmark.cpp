@@ -18,53 +18,61 @@ struct BenchmarkRow {
   double openmp_seconds = 0.0;
 };
 
-double average_runtime(BlockSortMode mode, const vector<vector<int>> &inputs,
+double average_runtime(BlockSortMode mode,
+                       const vector<vector<int>> &benchmark_samples,
                        const BlockSortCombination &combination,
                        uint32_t partition_seed_base) {
   using Clock = chrono::high_resolution_clock;
 
   double total_seconds = 0.0;
 
-  for (size_t i = 0; i < inputs.size(); ++i) {
-    const uint32_t seed = partition_seed_base + static_cast<uint32_t>(i);
-    const auto start = Clock::now();
+  for (size_t sample_index = 0; sample_index < benchmark_samples.size();
+       ++sample_index) {
+    const uint32_t partition_seed =
+        partition_seed_base + static_cast<uint32_t>(sample_index);
+    const auto start_time = Clock::now();
     const BlockSortExecution execution =
-        BlockSort::run_mode(mode, inputs[i], combination, seed);
-    const auto end = Clock::now();
+        BlockSort::run_mode(mode, benchmark_samples[sample_index], combination,
+                            partition_seed);
+    const auto end_time = Clock::now();
 
     if (!BlockSort::are_valid_block_sizes(execution.blocks_before_sort) ||
         !BlockSort::is_sorted_non_decreasing(execution.result) ||
-        !BlockSort::preserves_elements(inputs[i], execution.result)) {
+        !BlockSort::preserves_elements(benchmark_samples[sample_index],
+                                       execution.result)) {
       throw logic_error(string("Invalid result while benchmarking mode: ") +
                         BlockSort::mode_name(mode));
     }
 
-    total_seconds += chrono::duration<double>(end - start).count();
+    total_seconds += chrono::duration<double>(end_time - start_time).count();
   }
 
-  return total_seconds / static_cast<double>(inputs.size());
+  return total_seconds / static_cast<double>(benchmark_samples.size());
 }
 
 void write_results_csv(const vector<BenchmarkRow> &rows,
                        const filesystem::path &path) {
-  ofstream out(path);
-  out << "size,sequential_seconds,threads_seconds,openmp_seconds,best_combination\n";
+  ofstream output_file(path);
+  output_file
+      << "size,sequential_seconds,threads_seconds,openmp_seconds,best_combination\n";
 
   for (const auto &row : rows) {
-    out << row.size << ',' << fixed << setprecision(8) << row.sequential_seconds
-        << ',' << row.threads_seconds << ',' << row.openmp_seconds << ",\""
-        << BlockSort::combination_name(row.combination) << "\"\n";
+    output_file << row.size << ',' << fixed << setprecision(8)
+                << row.sequential_seconds << ',' << row.threads_seconds << ','
+                << row.openmp_seconds << ",\""
+                << BlockSort::combination_name(row.combination) << "\"\n";
   }
 }
 
 void write_results_dat(const vector<BenchmarkRow> &rows,
                        const filesystem::path &path) {
-  ofstream out(path);
-  out << "# size sequential threads openmp\n";
+  ofstream output_file(path);
+  output_file << "# size sequential threads openmp\n";
 
   for (const auto &row : rows) {
-    out << row.size << ' ' << fixed << setprecision(8) << row.sequential_seconds
-        << ' ' << row.threads_seconds << ' ' << row.openmp_seconds << '\n';
+    output_file << row.size << ' ' << fixed << setprecision(8)
+                << row.sequential_seconds << ' ' << row.threads_seconds << ' '
+                << row.openmp_seconds << '\n';
   }
 }
 
@@ -94,36 +102,44 @@ int main() {
     cout << "Tamanho " << size << ": gerando " << iterations
          << " vetores base..." << '\n';
 
-    const auto inputs =
+    const auto benchmark_samples =
         BlockSort::make_benchmark_inputs(size, iterations, max_value, input_seed);
-    const auto selection_inputs = BlockSort::make_benchmark_inputs(
+    const auto combination_selection_samples = BlockSort::make_benchmark_inputs(
         selection_size, selection_iterations, max_value, input_seed + 500);
 
     cout << "Tamanho " << size << ": escolhendo melhor combinacao..." << '\n';
-    const BlockSortBenchmarkSummary best =
-        BlockSort::select_best_combination(selection_inputs, partition_seed);
+    const BlockSortBenchmarkSummary best_combination_summary =
+        BlockSort::select_best_combination(combination_selection_samples,
+                                           partition_seed);
 
     cout << "  Melhor combinacao: "
-         << BlockSort::combination_name(best.combination) << '\n';
-    cout << "  Tempo medio da selecao: " << best.average_seconds << " s" << '\n';
+         << BlockSort::combination_name(best_combination_summary.combination)
+         << '\n';
+    cout << "  Tempo medio da selecao: "
+         << best_combination_summary.average_seconds << " s" << '\n';
 
-    BenchmarkRow row;
-    row.size = size;
-    row.combination = best.combination;
+    BenchmarkRow benchmark_row;
+    benchmark_row.size = size;
+    benchmark_row.combination = best_combination_summary.combination;
 
-    row.sequential_seconds = average_runtime(BlockSortMode::Sequential, inputs,
-                                             row.combination, partition_seed);
-    row.threads_seconds = average_runtime(BlockSortMode::Threads, inputs,
-                                          row.combination, partition_seed);
-    row.openmp_seconds = average_runtime(BlockSortMode::OpenMP, inputs,
-                                         row.combination, partition_seed);
+    benchmark_row.sequential_seconds =
+        average_runtime(BlockSortMode::Sequential, benchmark_samples,
+                        benchmark_row.combination, partition_seed);
+    benchmark_row.threads_seconds =
+        average_runtime(BlockSortMode::Threads, benchmark_samples,
+                        benchmark_row.combination, partition_seed);
+    benchmark_row.openmp_seconds =
+        average_runtime(BlockSortMode::OpenMP, benchmark_samples,
+                        benchmark_row.combination, partition_seed);
 
     cout << "  Medias:" << '\n';
-    cout << "  - sequencial: " << row.sequential_seconds << " s" << '\n';
-    cout << "  - std::thread: " << row.threads_seconds << " s" << '\n';
-    cout << "  - openmp: " << row.openmp_seconds << " s" << '\n';
+    cout << "  - sequencial: " << benchmark_row.sequential_seconds << " s"
+         << '\n';
+    cout << "  - std::thread: " << benchmark_row.threads_seconds << " s"
+         << '\n';
+    cout << "  - openmp: " << benchmark_row.openmp_seconds << " s" << '\n';
 
-    rows.push_back(row);
+    rows.push_back(benchmark_row);
     write_results_csv(rows, "results/benchmark_results.csv");
     write_results_dat(rows, "results/averages.dat");
   }
