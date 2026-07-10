@@ -96,6 +96,32 @@ Contém:
 - média da versão com `OpenMP`
 - melhor combinação escolhida para aquele tamanho
 
+#### Significado das métricas de seleção
+
+- `selected_training_seconds`: tempo médio da combinação vencedora nos mesmos
+  vetores usados para construir o ranking e escolhê-la. O termo `training`
+  identifica a amostra de seleção; não se refere a treinamento de inteligência
+  artificial.
+- `selected_validation_seconds`: tempo médio da combinação vencedora em outros
+  vetores, que não participaram da escolha. Essa métrica verifica se a
+  combinação continua rápida em dados independentes.
+- `baseline_validation_seconds`: tempo médio da combinação fixa de referência
+  nos mesmos vetores independentes usados em `selected_validation_seconds`.
+  A referência é `pares=InsertionSort`, `impares=SelectionSort`,
+  `final=MergeSort`.
+
+O ganho percentual da seleção dinâmica é calculado por:
+
+```text
+(baseline_validation_seconds - selected_validation_seconds)
+------------------------------------------------------------ × 100
+                 baseline_validation_seconds
+```
+
+Um resultado positivo indica que a combinação selecionada foi mais rápida que
+a referência fixa. Um resultado negativo indica que a referência fixa foi mais
+rápida na validação.
+
 ### `selection_ranking.csv`
 
 Contém o ranking completo das combinações para cada caso do benchmark, com:

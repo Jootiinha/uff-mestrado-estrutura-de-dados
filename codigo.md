@@ -467,7 +467,7 @@ Ele fixa:
 
 - tamanhos `15000`, `16000`, `17000`, `18000`, `19000`, `20000`;
 - `30` iterações por tamanho;
-- faixa de valores `[0, 100000]`.
+- faixa de valores `[0, 100000]`;
 - cinco vetores auxiliares de tamanho `2000` para seleção;
 - cinco vetores auxiliares diferentes, também de tamanho `2000`, para validação.
 
@@ -496,6 +496,32 @@ com os mesmos dados usados para definir a vencedora.
 
 Nos gráficos, o tamanho do eixo horizontal é o da execução principal. As
 amostras auxiliares permanecem pequenas para limitar o custo do ranking.
+
+### Métricas de seleção
+
+O `BenchmarkRow` separa três tempos para não confundir a escolha da combinação
+com a confirmação do seu desempenho:
+
+- `selected_training_seconds`: tempo médio da combinação vencedora nos mesmos
+  vetores usados para construir o ranking e escolhê-la. O termo `training`
+  representa a amostra de seleção e não treinamento de inteligência artificial.
+- `selected_validation_seconds`: tempo médio da combinação vencedora em outros
+  vetores, que não participaram da escolha. Essa medição verifica se a
+  combinação continua rápida em dados independentes.
+- `baseline_validation_seconds`: tempo médio da combinação fixa de referência
+  nos mesmos vetores independentes usados em `selected_validation_seconds`.
+
+O ganho percentual da seleção dinâmica é calculado por:
+
+```text
+(baseline_validation_seconds - selected_validation_seconds)
+------------------------------------------------------------ × 100
+                 baseline_validation_seconds
+```
+
+Um resultado positivo significa que a combinação selecionada foi mais rápida
+que a referência fixa. Um resultado negativo significa que a referência fixa
+foi mais rápida na validação.
 
 ### `average_runtime`
 
