@@ -28,10 +28,10 @@ O ponto de entrada manual fica em [run.cpp](/Users/joaocrm/Documents/dev/mestrad
   Executa o experimento oficial para os tamanhos pedidos no trabalho, calcula médias e salva os resultados.
 
 - [Makefile](/Users/joaocrm/Documents/dev/mestrado/uff-mestrado-estrutura-de-dados/Makefile:1)
-  Centraliza compilação, benchmark, geração de gráfico e limpeza.
+  Centraliza compilação, benchmark, geração de gráficos e limpeza.
 
 - [plot_results.gp](/Users/joaocrm/Documents/dev/mestrado/uff-mestrado-estrutura-de-dados/plot_results.gp:1)
-  Gera o gráfico em PNG a partir dos dados médios do benchmark.
+  Gera os gráficos em PNG a partir dos dados médios do benchmark.
 
 - [readme.md](/Users/joaocrm/Documents/dev/mestrado/uff-mestrado-estrutura-de-dados/readme.md:1)
   Explica como compilar, executar e gerar resultados.
@@ -468,6 +468,8 @@ Ele fixa:
 - tamanhos `15000`, `16000`, `17000`, `18000`, `19000`, `20000`;
 - `30` iterações por tamanho;
 - faixa de valores `[0, 100000]`.
+- cinco vetores auxiliares de tamanho `2000` para seleção;
+- cinco vetores auxiliares diferentes, também de tamanho `2000`, para validação.
 
 Esses números batem com o enunciado.
 
@@ -477,10 +479,23 @@ Para cada tamanho:
 
 1. gera os 30 vetores-base;
 2. gera um conjunto menor para selecionar a melhor combinação;
-3. escolhe a melhor combinação;
-4. roda os três modos com os mesmos dados;
-5. calcula a média;
-6. salva resultados parciais.
+3. mede o tempo total e guarda o ranking completo da seleção;
+4. valida a combinação vencedora contra uma combinação fixa usando outros vetores;
+5. roda os três modos com os mesmos dados do benchmark principal;
+6. calcula as médias;
+7. salva resultados parciais.
+
+A combinação fixa usada como referência é:
+
+- blocos pares: `InsertionSort`;
+- blocos ímpares: `SelectionSort`;
+- etapa final: `MergeSort`.
+
+Separar as amostras de seleção e validação evita justificar a escolha apenas
+com os mesmos dados usados para definir a vencedora.
+
+Nos gráficos, o tamanho do eixo horizontal é o da execução principal. As
+amostras auxiliares permanecem pequenas para limitar o custo do ranking.
 
 ### `average_runtime`
 
@@ -499,10 +514,17 @@ Ela:
 `write_results_csv` grava:
 
 - tamanho;
+- custo total da seleção;
+- tempo da vencedora nas amostras de seleção e validação;
+- tempo da combinação fixa na validação;
+- ganho percentual da seleção dinâmica;
 - média sequencial;
 - média com threads;
 - média com OpenMP;
 - combinação vencedora.
+
+`write_selection_ranking_csv` grava todas as combinações avaliadas, suas
+posições e seus tempos médios.
 
 `write_results_dat` grava um formato simples para o `gnuplot`.
 
@@ -586,25 +608,29 @@ O [Makefile](/Users/joaocrm/Documents/dev/mestrado/uff-mestrado-estrutura-de-dad
   Compila `benchmark.cpp`, cria `results/` e executa o benchmark.
 
 - `make plot`
-  Roda o `gnuplot` para gerar `results/chart.png`.
+  Roda o `gnuplot` para gerar os gráficos em `results/`.
 
 - `make clean`
   Remove binários e resultados.
 
 No macOS, o Makefile ajusta as flags de `OpenMP` usando o caminho do `libomp` instalado com Homebrew.
 
-## 18. Como o gráfico é gerado
+## 18. Como os gráficos são gerados
 
-O arquivo [plot_results.gp](/Users/joaocrm/Documents/dev/mestrado/uff-mestrado-estrutura-de-dados/plot_results.gp:1) lê `results/averages.dat` e gera um PNG com três curvas:
+O arquivo [plot_results.gp](/Users/joaocrm/Documents/dev/mestrado/uff-mestrado-estrutura-de-dados/plot_results.gp:1) lê `results/averages.dat` e gera cinco gráficos:
 
-- `Sequencial`
-- `std::thread`
-- `OpenMP`
+- custo total do ranking dinâmico;
+- comparação entre `Sequencial`, `std::thread` e `OpenMP`;
+- cinco primeiras posições do ranking de combinações;
+- ganho da combinação selecionada contra a referência fixa;
+- algoritmos escolhidos nos blocos pares, blocos ímpares e etapa final.
 
-Os eixos são:
+Os gráficos usam o tamanho do vetor da execução principal no eixo horizontal.
+As métricas verticais variam entre:
 
-- tamanho do vetor;
-- tempo médio em segundos.
+- tempo total ou médio em segundos;
+- redução percentual de tempo;
+- algoritmo escolhido em cada etapa.
 
 ## 19. Fluxo completo do projeto
 
@@ -699,4 +725,4 @@ O coração do sistema está em `block_sort.hpp`, que:
 
 `run.cpp` serve para inspecionar a execução detalhadamente.
 
-`benchmark.cpp` serve para produzir as médias pedidas no trabalho e alimentar o gráfico final.
+`benchmark.cpp` serve para produzir as médias pedidas no trabalho e alimentar os gráficos finais.
