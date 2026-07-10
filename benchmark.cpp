@@ -147,8 +147,8 @@ void write_results_dat(const vector<BenchmarkRow> &rows,
 int main() {
   const vector<int> sizes = {15000, 16000, 17000, 18000, 19000, 20000};
   const int iterations = 30;
-  const int selection_iterations = 30;
-  const int selection_size = 15000;
+  const int selection_iterations = 10;
+  const int selection_size = 10000;
   const int max_value = 100000;
   const uint32_t input_seed_base = 20260709;
   const uint32_t partition_seed_base = 91000;

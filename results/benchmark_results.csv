@@ -1,0 +1,3 @@
+size,selection_total_seconds,selected_training_seconds,selected_validation_seconds,baseline_validation_seconds,selection_gain_percent,sequential_seconds,threads_seconds,openmp_seconds,best_combination,baseline_combination
+15000,81.59945412,0.54374002,0.54155530,0.54465792,0.56964498,1.24091586,1.28409842,1.22138607,"pares=InsertionSort, impares=SelectionSort, final=QuickSort","pares=InsertionSort, impares=SelectionSort, final=MergeSort"
+16000,80.59029633,0.54213328,0.54533785,0.56033498,2.67645857,1.40029463,1.46266193,1.39391249,"pares=InsertionSort, impares=SelectionSort, final=QuickSort","pares=InsertionSort, impares=SelectionSort, final=MergeSort"
