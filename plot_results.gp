@@ -18,11 +18,12 @@ plot 'results/averages.dat' using 1:7 with linespoints linewidth 2 title 'Sequen
 set output 'results/chart_selection_ranking.png'
 set title "Cinco Melhores Combinacoes na Amostra de Selecao"
 set ylabel "Tempo Medio (segundos)"
-plot 'results/averages.dat' using 1:10 with linespoints linewidth 2 title '1o lugar', \
-     'results/averages.dat' using 1:11 with linespoints linewidth 2 title '2o lugar', \
-     'results/averages.dat' using 1:12 with linespoints linewidth 2 title '3o lugar', \
-     'results/averages.dat' using 1:13 with linespoints linewidth 2 title '4o lugar', \
-     'results/averages.dat' using 1:14 with linespoints linewidth 2 title '5o lugar'
+plot 'results/averages.dat' using 1:15 with points pointtype 7 pointsize 1.5 title 'Blocos pares', \
+       'results/averages.dat' using 1:16 with points pointtype 5 pointsize 1.5 title 'Blocos impares', \
+       'results/averages.dat' using 1:17 with points pointtype 9 pointsize 1.5 title 'Etapa final', \
+       'results/averages.dat' using 1:15:15 with labels offset 0,0.7 notitle, \
+       'results/averages.dat' using 1:16:16 with labels offset 0,0.7 notitle, \
+       'results/averages.dat' using 1:17:17 with labels offset 0,0.7 notitle
 
 set output 'results/chart_selection_gain.png'
 set title "Ganho da Selecao Dinamica contra Combinacao Fixa"

@@ -1,3 +1,7 @@
 size,selection_total_seconds,selected_training_seconds,selected_validation_seconds,baseline_validation_seconds,selection_gain_percent,sequential_seconds,threads_seconds,openmp_seconds,best_combination,baseline_combination
 15000,81.59945412,0.54374002,0.54155530,0.54465792,0.56964498,1.24091586,1.28409842,1.22138607,"pares=InsertionSort, impares=SelectionSort, final=QuickSort","pares=InsertionSort, impares=SelectionSort, final=MergeSort"
 16000,80.59029633,0.54213328,0.54533785,0.56033498,2.67645857,1.40029463,1.46266193,1.39391249,"pares=InsertionSort, impares=SelectionSort, final=QuickSort","pares=InsertionSort, impares=SelectionSort, final=MergeSort"
+17000,79.86610600,0.54090223,0.55067095,0.55948693,1.57572422,1.62012873,1.80958348,1.84883870,"pares=SelectionSort, impares=BubbleSort, final=QuickSort","pares=InsertionSort, impares=SelectionSort, final=MergeSort"
+18000,88.11195813,0.54968617,0.56404487,0.59388421,5.02443690,1.89123028,1.94229677,1.77081601,"pares=InsertionSort, impares=MergeSort, final=QuickSort","pares=InsertionSort, impares=SelectionSort, final=MergeSort"
+19000,80.53586467,0.54173055,0.55127811,0.55254825,0.22986836,1.97122492,2.06803020,1.97805719,"pares=InsertionSort, impares=BubbleSort, final=QuickSort","pares=InsertionSort, impares=SelectionSort, final=MergeSort"
+20000,80.77653767,0.54266987,0.55111655,0.55098149,-0.02451378,2.17810546,2.27043472,2.18767175,"pares=MergeSort, impares=BubbleSort, final=QuickSort","pares=InsertionSort, impares=SelectionSort, final=MergeSort"
