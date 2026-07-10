@@ -163,7 +163,7 @@ Para a definição dinâmica da melhor combinação de algoritmos de ordenação
 
 Para todos os tamanhos de vetores o \textit{Quick sort} foi selecionado como o algoritmo mais adequado para a união final dos subconjuntos. Para os blocos de tamanho par e ímpar, a combinação variou conforme o tamanho do vetor, pois a escolha foi feita a partir do menor tempo médio observado no processo de seleção.
 
-\indent A interpretação da Figura \ref{fig:combinacoes_escolhidas} é feita pela associação entre cada ponto e o algoritmo escolhido. No eixo vertical, os valores correspondem aos algoritmos testados: 1 para \textit{Insertion Sort}, 2 para \textit{Selection Sort}, 3 para \textit{Bubble Sort}, 4 para \textit{Merge Sort} e 5 para \textit{Quick Sort}. Assim, observa-se que o \textit{Quick Sort} permaneceu constante na etapa final, enquanto os algoritmos dos blocos pares e ímpares mudaram conforme o tamanho da entrada.
+\indent A interpretação da Figura \ref{fig:ranking_combinacoes} é feita pela associação entre cada ponto e o algoritmo escolhido. No eixo vertical, os valores correspondem aos algoritmos testados: 1 para \textit{Insertion Sort}, 2 para \textit{Selection Sort}, 3 para \textit{Bubble Sort}, 4 para \textit{Merge Sort} e 5 para \textit{Quick Sort}. Assim, observa-se que o \textit{Quick Sort} permaneceu constante na etapa final, enquanto os algoritmos dos blocos pares e ímpares mudaram conforme o tamanho da entrada.
 
 
 A Figura \ref{fig:ranking_combinacoes} apresenta os tempos médios das cinco melhores combinações avaliadas na amostra de seleção.
@@ -201,6 +201,16 @@ A Figura \ref{fig:ranking_combinacoes} apresenta os tempos médios das cinco mel
 
 \subsection{Arquitetura do Projeto}
 
+A implementação foi organizada de forma modular para facilitar a comparação entre as três versões solicitadas: sequencial, \textit{std::thread} e \textit{OpenMP}. A lógica principal do algoritmo foi mantida em uma estrutura comum, enquanto cada versão altera apenas a forma de executar a ordenação dos blocos.
+
+\indent Essa organização evita duplicação de código e garante que as três versões executem a mesma sequência de etapas: divisão dinâmica do vetor em blocos de tamanho 4 ou 5, ordenação dos blocos pares e ímpares com algoritmos definidos pela combinação escolhida, consolidação final dos blocos e validação do resultado.
+
+\indent Também foram mantidos os mesmos vetores de entrada e as mesmas sementes de particionamento nas três versões. Essa decisão torna a comparação mais justa, pois reduz a interferência de diferenças nos dados de entrada ou na formação dos blocos.
+
+\indent Além disso, foram adicionadas validações para verificar se os blocos possuem tamanho correto, se o vetor final está ordenado e se todos os elementos originais foram preservados. Os resultados também são exportados em arquivos auxiliares, permitindo a geração dos gráficos utilizados na análise.
+
+\indent Por fim, a implementação inclui uma etapa automática de escolha da melhor combinação de algoritmos. Em vez de definir manualmente uma combinação fixa, o programa avalia as combinações permitidas pelo enunciado, respeitando a regra de não repetir o mesmo algoritmo em etapas diferentes. A combinação com menor tempo médio é então usada nas execuções comparativas.
+
 Na implementação baseada em \textit{threads} nativas (utilizando \textit{std::thread}), o paralelismo é gerenciado de forma explícita. O programa instancia uma \textit{thread} para cada bloco gerado. Cada \textit{thread} ordena, de maneira independente e concorrente, o bloco recebido com o algoritmo correspondente ao seu tamanho. Ao término do processamento, realiza-se o sincronismo por meio do método \textit{join()} antes que a execução invoque o algoritmo de consolidação final.
 
 
@@ -217,8 +227,12 @@ hardware e sistema operacional:
     \item Sistema Operacional: macOS 26.4.1
     \item Processador: Apple M1 (8 núcleos)
     \item Memória RAM: 8 GB
+    \item Biblioteca OpenMP: \textit{libomp}
     
 \end{itemize}
+
+\indent Como o desenvolvimento foi feito em macOS, foi necessário configurar explicitamente a biblioteca \textit{libomp} no \textit{Makefile}. Em ambientes Linux, a compilação com OpenMP normalmente pode ser feita apenas com a flag \texttt{-fopenmp}. No macOS, porém, o compilador não encontra automaticamente os cabeçalhos e a biblioteca de linkedição do OpenMP. Por isso, o \textit{Makefile} identifica o sistema como \textit{Darwin} e adiciona os caminhos de inclusão e linkedição da \textit{libomp}, instalada via Homebrew.
+
 
 A Figura \ref{fig:comparacao_paralelismo} abaixo apresenta os tempos médios dos algoritmos para cada implementação (\textit{threads}, \textit{OpenMP} e sequencial).
 
